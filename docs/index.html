@@ -437,7 +437,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Doxter: Docs-Generator from PB Sources.</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">version 0.1.1-alpha,</span>
+<span id="revnumber">version 0.1.2-alpha,</span>
 <span id="revdate">September 25, 2018</span>
 <br><span id="revremark">Public Alpha</span>
 </div>
@@ -479,7 +479,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_to_be_continued">To Be Continued&#8230;&#8203;</a></li>
 <li><a href="#_license">License</a></li>
-<li><a href="#_roadmap_and_todos">Roadmap and TODOs</a></li>
+<li><a href="#_roadmap">Roadmap</a></li>
 <li><a href="#_changelog">Changelog</a></li>
 </ul>
 </div>
@@ -1143,7 +1143,7 @@ Here&#8217;s an example from the very source of Doxter:</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-purebasic hljs" data-lang="purebasic">;= Doxter: Docs-Generator from PB Sources.
 ;| Tristano Ajmone, &lt;tajmone@gmail.com&gt;
-;| v0.1.1-alpha, September 25, 2018: Public Alpha
+;| v0.1.2-alpha, September 25, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
@@ -1303,68 +1303,19 @@ SOFTWARE.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_roadmap_and_todos">Roadmap and TODOs</h2>
+<h2 id="_roadmap">Roadmap</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Doxter it&#8217;s still a young application, and there is always room for improvements.
-Here is a list of pending tasks and new features waiting to be implemented.</p>
+Here is a list of upcoming features, waiting to be implemented.</p>
 </div>
-<div class="ulist checklist">
-<ul class="checklist">
+<div class="ulist">
+<ul>
 <li>
-<p><i class="fa fa-square-o"></i> At startup look for a settings file and, if found, check if it contains
-a Doxter version and if it matches the current version of the running
-tool. This is to ensure that in shared projects everyone is using the
-latest release of Doxter (someone might forget to recompile after pulling
-changes from the repo).</p>
-<div class="ulist checklist">
-<ul class="checklist">
-<li>
-<p><i class="fa fa-square-o"></i> Allow use of SemVer constraint operators to permit tolerance in MINOR
-and PATCH version differences.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> Allow regions merging:</p>
-<div class="ulist checklist">
-<ul class="checklist">
-<li>
-<p><i class="fa fa-square-o"></i> Before sorting regions, sort and merge regions with same Tag ID.</p>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> Add <code>;&gt;&gt;</code> and <code>;}&gt;&gt;</code> to assing the last used Tag ID (instead of fallback
-Tag ID) to the region&#8201;&#8212;&#8201;only works if no tag is provided!
-This simplifies creating contiguos regions with same Tag ID for merging.</p>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> ADoc region tags must be injected before regions sorting, not at parse
-time, otherwise they prevent merging operations.</p>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> Advanced merge features for splitting PB source across regions:</p>
-<div class="ulist checklist">
-<ul class="checklist">
-<li>
-<p><i class="fa fa-square-o"></i> <code>;&lt;!</code> and <code>;}&lt;!</code> to prevent both closing an open source block (if any)
-and adding empty line after closing tag. This is needed for regions
-merging, where a PB source block might carry on in the next region.</p>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> Likewise, <code>;&gt;!</code> and <code>;{&gt;!</code> to prevent opening a source block when the
-next region starts with PB code. This is needed when splitting a region
-of PB source.</p>
-</li>
-<li>
-<p><i class="fa fa-square-o"></i> It might be useful to add some state-tracking vars in the <code>RegionData</code>
-Structure to track the parser state at end-of-region time (eg, if there</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
+<p><strong>Sub-Regions Merging</strong>.
+Same-named regions will be stitched together into a single region, making
+their inclusion in other documents easier.
+Sub-weights will be used for sorting before merging the region.</p>
 </li>
 </ul>
 </div>
@@ -1376,10 +1327,13 @@ Structure to track the parser state at end-of-region time (eg, if there</p>
 <div class="ulist">
 <ul>
 <li>
-<p>v0.1.1-alpha (2018/25/21)&#8201;&#8212;&#8201;created Doxter repository on GitHub.</p>
+<p>v0.1.2-alpha (2018/09/25)&#8201;&#8212;&#8201;Aesthetic changes.</p>
 </li>
 <li>
-<p>v0.1.0-alpha (2018/09/21)&#8201;&#8212;&#8201;first public released Alpha:
+<p>v0.1.1-alpha (2018/09/25)&#8201;&#8212;&#8201;Created Doxter repository on GitHub.</p>
+</li>
+<li>
+<p>v0.1.0-alpha (2018/09/21)&#8201;&#8212;&#8201;First public released Alpha:
 <a href="https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb" class="bare">https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb</a></p>
 </li>
 </ul>
@@ -1389,8 +1343,8 @@ Structure to track the parser state at end-of-region time (eg, if there</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1.1-alpha<br>
-Last updated 2018-09-25 02:33:40 ora legale Europa occidentale
+Version 0.1.2-alpha<br>
+Last updated 2018-09-25 14:45:10 ora legale Europa occidentale
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">

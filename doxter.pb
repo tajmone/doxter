@@ -1,6 +1,6 @@
 ﻿;= Doxter: Docs-Generator from PB Sources.
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.1.1-alpha, September 25, 2018: Public Alpha
+;| v0.1.2-alpha, September 25, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 
 ;>description(1)
 ;| =============================================================================
-;| image::Doxter_logo.svg[Doxter Logo,align="center"]
+;| image::doxter_logo.svg[Doxter Logo,align="center"]
 ;|
 ;| Doxter is a tool to generate AsciiDoc documentation from PureBasic source
 ;| files, by using a special notations in comments delimiters to markup tagged
@@ -1103,8 +1103,7 @@ EndProcedure
 ;{>LICENSE(9000)
 ;| == License
 ;| 
-;~| .............................................................................
-;| ==================
+;| =============================================================================
 ;| MIT License
 ;| 
 ;| Copyright (c) 2018 Tristano Ajmone +
@@ -1127,8 +1126,7 @@ EndProcedure
 ;| LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ;| OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;| SOFTWARE.
-;| ==================
-;~| .............................................................................
+;| =============================================================================
 ;}<
 
 
@@ -1138,44 +1136,26 @@ EndProcedure
 ; *                                                                            *
 ;{******************************************************************************
 ;>TODOs(10000)
-;| == Roadmap and TODOs
+;| == Roadmap
 ;|
 ;| Doxter it's still a young application, and there is always room for improvements.
-;| Here is a list of pending tasks and new features waiting to be implemented.
+;| Here is a list of upcoming features, waiting to be implemented.
 ;|
-;| * [ ] At startup look for a settings file and, if found, check if it contains
-;|       a Doxter version and if it matches the current version of the running
-;|       tool. This is to ensure that in shared projects everyone is using the
-;|       latest release of Doxter (someone might forget to recompile after pulling
-;|       changes from the repo).
-;| ** [ ] Allow use of SemVer constraint operators to permit tolerance in MINOR
-;|        and PATCH version differences.
-;| * [ ] Allow regions merging:
-;| ** [ ] Before sorting regions, sort and merge regions with same Tag ID.
-;| ** [ ] Add `;>>` and `;}>>` to assing the last used Tag ID (instead of fallback
-;|         Tag ID) to the region -- only works if no tag is provided!
-;|         This simplifies creating contiguos regions with same Tag ID for merging.
-;| ** [ ] ADoc region tags must be injected before regions sorting, not at parse
-;|        time, otherwise they prevent merging operations.
-;| ** [ ] Advanced merge features for splitting PB source across regions:
-;| *** [ ] `;<!` and `;}<!` to prevent both closing an open source block (if any)
-;|        and adding empty line after closing tag. This is needed for regions
-;|        merging, where a PB source block might carry on in the next region.
-;| *** [ ] Likewise, `;>!` and `;{>!` to prevent opening a source block when the
-;|        next region starts with PB code. This is needed when splitting a region
-;|        of PB source.
-;| *** [ ] It might be useful to add some state-tracking vars in the `RegionData`
-;|         Structure to track the parser state at end-of-region time (eg, if there
+;| * *Sub-Regions Merging*.
+;|    Same-named regions will be stitched together into a single region, making
+;|    their inclusion in other documents easier.
+;|    Sub-weights will be used for sorting before merging the region. 
 ;<
 ;}******************************************************************************
 ; *                                                                            *
 ;-                                  CHANGELOG
 ; *                                                                            *
 ; ******************************************************************************
-;{>CAHNGELOG(20000)
+;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
-;| * v0.1.1-alpha (2018/25/21) -- created Doxter repository on GitHub.
-;| * v0.1.0-alpha (2018/09/21) -- first public released Alpha:
+;| * v0.1.2-alpha (2018/09/25) -- Aesthetic changes.
+;| * v0.1.1-alpha (2018/09/25) -- Created Doxter repository on GitHub.
+;| * v0.1.0-alpha (2018/09/21) -- First public released Alpha:
 ;| https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb
 ;}<
