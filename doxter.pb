@@ -1,11 +1,11 @@
 ﻿;= Doxter: Docs-Generator from PB Sources.
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.1.2-alpha, September 25, 2018: Public Alpha
+;| v0.1.3-alpha, September 29, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.1.7"
+#DOXTER_VER$ = "0.1.3-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
@@ -51,12 +51,13 @@ Declare.s  StripCommentLine(codeline.s)
 Declare    ADocSourceStart(weight = 0)
 Declare    ADocSourceEnd(weight = 0)
 Declare    Abort(ErrMsg.s)
-Declare.s  LinePreview(text.s, LineNum = 0, weight = 0)
+Declare.s  LinePreview(text.s, LineNum = 0, weight = 0, subweight = 0)
 Declare.s  HeaderLinePreview(text.s, LineNum = 0)
 ;}==============================================================================
 ;                                   Internals
 ;{==============================================================================
 ;{>Comments_Marks(4100)
+;| 
 ;| === Doxter Markers Primer
 ;|
 ;| The way Doxter decides which parts of your sorce code to treat as documentation
@@ -74,23 +75,21 @@ Declare.s  HeaderLinePreview(text.s, LineNum = 0)
 ;| ¦ ;< ¦ Region End   ¦ Marks end of a tagged region.
 ;| |============================================================================
 ;|
-;| The *Tagged Region* marker can also include PureBasic's foldable comments
-;| delimiters:
+;| [NOTE]
+;| =============================================================================
+;| You can freely use PureBasic's special comments marks (`;{`/;`}`/`;-`) within
+;| Doxter's markers (e.g. `;{>`, `;}~`, `;-|`, etc.) execpt in the ADoc Header
+;| marker, which must be `;=`.
+;| This allows you to create regions which are foldable in PureBasic IDE.
+;| =============================================================================
 ;|
-;| .Region Markers Variants
-;| [cols="7m,98d"]
-;| |============================
-;| | ;{> | Foldable Region Begin
-;| | ;}< | Foldable Region End
-;| |============================
-;|
-;| The *Tagged Region End* marker has an alternative syntax to tell Doxter no to
-;| add an empty line after closing the region:
+;| The *Tagged Region End* marker has an alternative syntax to prevent Doxter
+;| from adding an empty line after closing the region:
 ;|
 ;| .Region Markers Modifiers
-;| [cols="2*7m,20d,66d"]
+;| [cols="7m,20d,66d"]
 ;| |============================================================================
-;| | ;<< | ;}<< | Unspaced Region End | Don't add empty line after closing tag.
+;| | ;<< | Unspaced Region End | Don't add empty line after closing tag.
 ;| |============================================================================
 ;|
 ;| This is useful when splitting a paragraph across multiple regions, in order to
@@ -99,13 +98,17 @@ Declare.s  HeaderLinePreview(text.s, LineNum = 0)
 ;| region tag, which would split the text in multiple paragraphs in the final
 ;| document.
 ;}<
-#mrk_RegionStart = ";{?>"
-#mrk_RegionEnd   = ";}?<"
-#mrk_ADocLine    = ";\|"
-#mrk_SkipLine    = ";~"
+
+#PB_CommDelim = ";[{}\-]?"
+
+#mrk_RegionStart = #PB_CommDelim + ">"
+#mrk_RegionEnd   = #PB_CommDelim + "<"
+#mrk_ADocLine    = #PB_CommDelim + "\|"
+#mrk_SkipLine    = #PB_CommDelim + "~"
 
 Structure RegionData
   Weight.i
+  Subweight.i
   Tag.s
   List StringsL.s()
 EndStructure
@@ -134,7 +137,10 @@ DataSection
   REGEX_PATTERNS:
   Data.s "^\s*?" + #mrk_RegionStart +     ; #RE_TagRegionBegin -- Named groups:
          "(?<tag>\w*)"+                   ;   <tag>                   (optional)
-         "(\((?<weight>\d*)\))?"          ;   <weight>                (optional)
+         "(\("+                           ;
+         "(?<weight>\d*)?"+               ;   <weight>                (optional)
+         "(\.(?<subweight>\d+))?"+        ;   <subweight>             (optional)
+         "\))?"
   Data.s "^\s*?" + #mrk_RegionEnd +       ; #RE_TagRegionEnd -- Named groups:
          "(?<modifier>[<]?)"              ;   <modifier>              (optional)
   Data.s "^\s*"+ #mrk_ADocLine +" ?(.*)$" ; #RE_ADocComment
@@ -159,7 +165,7 @@ PrintN("Doxter v" + #DOXTER_VER$)
 ; Get Command Line Parameter
 ; ==========================
 SrcFile.s = ProgramParameter()
-;{>CLI_Usage(3200)--------------------------------------------------------------
+;{>CLI_Usage(.10)--------------------------------------------------------------
 ;|=== Command Line Options
 ;|
 ;| To invoke Doxter via command prompt/shell:
@@ -178,7 +184,7 @@ EndIf
 ;  ===============================
 ;- Check that source file is valid
 ;  ===============================
-;{>Validate_File_Extension(3300)------------------------------------------------
+;{>Input_File_Validation(3300)--------------------------------------------------
 ;| === Input File Validation
 ;|
 ;| Doxter checks that the passed `<sourcefile>` parameter has a valid extension:
@@ -201,7 +207,7 @@ EndSelect
 If Not ValidExt
   Abort(~"Invalid file extension \"."+ SrcExt +~"\". Only PB and SB files accepted.")
 EndIf
-;{>File_Checks(3320)------------------------------------------------------------
+;{>Input_File_Validation -------------------------------------------------------
 ;| Doxter will also check that the file exists, it's not a directory, and it's
 ;| not 0 Kb in size; and abort with Status Error if any of these are met.
 ;}<-----------------------------------------------------------------------------
@@ -227,7 +233,7 @@ PrintN("Total tagged regions found: "+ Str(totRegions))
 
 OutFile.s = SrcFile
 
-If ListSize( HeaderL() )
+If ListSize(HeaderL())
   ; ----------------------------
   ; Document Has AsciiDoc Header
   ; ----------------------------
@@ -278,12 +284,12 @@ If DocHeader
   ; Write Header to File
   ; --------------------
   ForEach HeaderL()
-    If Not WriteStringN(0, HeaderL() )
+    If Not WriteStringN(0, HeaderL())
       Abort("Couldn't write to file: "+ OutFile)
     EndIf
   Next
   ; Add blank line after Header
-  If Not WriteStringN(0, #Empty$ )
+  If Not WriteStringN(0, #Empty$)
     Abort("Couldn't write to file: "+ OutFile)
   EndIf
 EndIf
@@ -294,7 +300,7 @@ EndIf
 ForEach RegionsL()
   With RegionsL()
     ForEach \StringsL()
-      If Not WriteStringN(0, \StringsL() )
+      If Not WriteStringN(0, \StringsL())
         Abort("Couldn't write to file: "+ OutFile)
       EndIf
     Next
@@ -302,7 +308,7 @@ ForEach RegionsL()
 Next
 
 ; Add empty line at EOL
-If Not WriteStringN(0, #Empty$ )
+If Not WriteStringN(0, #Empty$)
   Abort("Couldn't write to file: "+ OutFile)
 EndIf
 
@@ -343,11 +349,11 @@ Procedure ParseFile(SrcFileName.s)
   
   ; TODO: Could implement read opearions using file format from BOM! (currently only UTF-8 supported)
   PrintN("Parsing source file: " + SrcFileName)
-  PrintN( LSet(#Empty$, 80, "=") )
+  PrintN(LSet(#Empty$, 80, "="))
   
-  ; ============
-  ; Parser Setup
-  ; ============
+  ;  ============
+  ;- Parser Setup
+  ;  ============
   ;{>Regions_Parser_Modalities(4242)
   ;~----------------------------------------------------------------------------
   ;| The *Regions Parser* alternates between two mutually exclusive modalities:
@@ -376,6 +382,22 @@ Procedure ParseFile(SrcFileName.s)
     #InsideRegion
   EndEnumeration
   
+  
+  ; Regions-Tracking Map
+  ;{====================
+  ; The parser uses this map to track the last weights used for every region.
+  ; Wether the weights were defined in the Region Marker or were auto-generated,
+  ; this map will always keep track of the last eights used during parsing.
+  ; Region names are case sensitive in Asciidoctor (and PureBasic Map keys too).
+  Structure RegionTracking
+    weight.i        ; Last weight used for region tag.
+    subweight.i     ; Last subweight used for region tag.
+    count.i         ; Tracks number of same-named regions found
+  EndStructure
+  
+  NewMap RegionsTrackM.RegionTracking()
+  ;}
+  
   cntLine = 1
   ParserState = #Seeking
   currTag.s = #Empty$
@@ -397,12 +419,12 @@ Procedure ParseFile(SrcFileName.s)
   ;|   leading space allowed):
   ;| ** *No*? Reset file pointer position to beginning of file and relinquish
   ;|    control to the Regions Parser. (Quit Parsing)
-  ;| ** *Yes*? Then an AsciiDoc Header was found; strip away the `;` and store the
-  ;|    line in the Header's data storage, then:
+  ;| ** *Yes*? Then an AsciiDoc Header was found; strip away the `;` and store
+  ;|    the line in the Header's data storage, then:
   ;| *** (_loop entrypoint_) Store current file position pointer and parse the
   ;|     next line:
-  ;| **** If an ADoc Comment line (`;|`) is found, strip it of the marker and add
-  ;|      it to Header's data storage, then carry on with parsing loop.
+  ;| **** If an ADoc Comment line (`;|`) is found, strip it of the marker and
+  ;|      add it to Header's data storage, then carry on with parsing loop.
   ;| **** If a Skip Comment line (`;~`) is found, ignore it and carry on with
   ;|      parsing loop.
   ;| **** If the parsed line is none of the above, restore previous file position
@@ -466,11 +488,20 @@ Procedure ParseFile(SrcFileName.s)
   ;|    characters are a Region Begin Tag (`;>`):
   ;| *** *No*? Ignore line and carry on with parsing parsing loop in Seeking mode.
   ;| *** *Yes*?
-  ;| **** Process line and extract tag name and weight (if present)
-  ;| **** Create new data storage for this region and asign it its weight
-  ;| **** Add AsciiDoc line to stored region data with tagged region (e.g.
-  ;|      `// tag::tagId[]` where `tagId` will be either the extracted tag or an
-  ;|      autogenerated default fallback tag)
+  ;| **** Process line and extract _tag_, _weight_ and _subweight_ (if present):
+  ;| ***** if no _tag_ was provided, use default fallback Id instead: `region`
+  ;|       followed by a counter that increases at each use (e.g. `region1`,
+  ;|       `region2`, etc.).
+  ;| ***** if no _weight_ was provided: 
+  ;| ****** if a region with same _tag_ already exists in memory, retrive its
+  ;|        weight and use it, otherwise assign the last used weigth incremented
+  ;|        by one (assume that the users wishes the new region to be continguos
+  ;|        with the preceding one).
+  ;| ***** if no _subweight_ was provided: 
+  ;| ****** if a region with same _tag_ already exists in memory, retrive its
+  ;|        last used subweight, increase by 1 and use it, otherwise use value 1.
+  ;| **** Create new entry in memory for this region fragment and store its weight
+  ;|      and subweight values.
   ;| **** Enter _InsideRegion_ modality (Switch Loop).
   ;| * (*InsideRegion Modality*):
   ;| ** (_loop entrypoint_) Parse line and check if its first non-white space
@@ -496,18 +527,31 @@ Procedure ParseFile(SrcFileName.s)
   ;| ***** If parser is in _InsideCode_ state, add to current region's stored data
   ;|       an AsciiDoc line containing a source delimiter to end source code
   ;|       block, followed by a blank line. Carry on parsing loop.
-  ;| ***** Add AsciiDoc line to stored region data to end tagged region (e.g.
-  ;|      `// end::tagId[]` where `tagId` will be tag assigned to the current
-  ;|       current region).
   ;| ***** Check if the Region End marker contais the `<` modifier (`;<<`);
   ;|       if not, add a blank line to current region, otherwise not.
   ;| ***** Revert to _Seeking_ modality (Switch Loop).
+  ;| 
+  ;| [NOTE]
+  ;| ===========================================================================
+  ;| During the parsing stage no AsciiDoc tagged region begin/end lines are added
+  ;| to the regions stored in memory, because regions with same tag still need
+  ;| to be sorted and merged together (the parser stores each region fragment
+  ;| separately, regardless of its tag).
+  ;| It will be the postprocessor's job to handle all that, and once fragmented
+  ;| regions are merged together the AsciiDoc `// tag:[]` and `// end:[]` lines
+  ;| will be added at their start and end, respectively.
+  ;| 
+  ;| The AsciiDoc `// tag:[]` and `// end:[]` lines shown in the Live Preview
+  ;| are just for debugging purposes, so to speak, but they are not actually
+  ;| stored in memory at that point.
+  ;| ===========================================================================
+  ;| 
   ;}<---------------------------------------------------------------------------
   
   ; Scan every line of the source file until EOF
   While Eof(0) = 0
     CurrLine.s = ReadString(0)
-    
+    ; TODO: optimize: Use a RegEx to check if any marker matches, instead of multiple checks.
     Select ParserState
       Case #Seeking
         ; ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -520,9 +564,7 @@ Procedure ParseFile(SrcFileName.s)
           ParserState = #InsideRegion
           If ExamineRegularExpression(#RE_TagRegionBegin, CurrLine)
             NextRegularExpressionMatch(#RE_TagRegionBegin)
-            ; --------------
-            ; Extract Tag ID
-            ; --------------
+            ; ///// Establish Region's Tag /////
             currTag = RegularExpressionNamedGroup(#RE_TagRegionBegin, "tag")
             If currTag = #Empty$
               ; No Tag ID found, create one:
@@ -530,32 +572,56 @@ Procedure ParseFile(SrcFileName.s)
               currTag = #FallbackTag + Str(FallbackCnt)
               FallbackCnt +1
             EndIf
-            ; ------------------
-            ; Extract Tag Weight
-            ; ------------------
-            Weight$ = RegularExpressionNamedGroup(#RE_TagRegionBegin, "weight")
-            If Weight$ = #Empty$
-              ; No Tag Weight found, asign current +1
+            RegionIsNotNew = FindMapElement(RegionsTrackM(), currTag) ; NOTE: Map keys are case-sensitive!
+                                                                      ; ///// Establish Region's Weight /////
+            parsedWeight.s = RegularExpressionNamedGroup(#RE_TagRegionBegin, "weight")
+            If parsedWeight = #Empty$
+              ; No Tag Weight found, auto-generate it
               ; -------------------------------------
-              currWeight +1
+              If RegionIsNotNew ; retrive its last used weight.
+                currWeight = RegionsTrackM()\weight
+              Else ; It's a new region, assign it the last used weight + 1.
+                   ; (assume author wants it to be after last used region)
+                currWeight +1
+              EndIf
             Else
-              currWeight = Val(Weight$)
+              currWeight = Val(parsedWeight)
+            EndIf
+            ; ///// Establish Region's Subweight /////
+            parsedSubweight.s = RegularExpressionNamedGroup(#RE_TagRegionBegin, "subweight")
+            If parsedSubweight = #Empty$
+              ; No Tag Subweight found, auto-generate it
+              ; -------------------------------------
+              If RegionIsNotNew ; retrive its last used Subweight And add 1 To it.
+                currSubweight = RegionsTrackM(currTag)\Subweight +1
+              Else ; It's a new region, assign it default Subweight = 1.
+                currSubweight = 1
+              EndIf
+            Else
+              currSubweight = Val(parsedSubweight)
             EndIf
           EndIf
           ; ----------------------------
           ; Add New Region to List
           ; ----------------------------
-          AddElement( RegionsL() )
+          AddElement(RegionsL())
           With RegionsL()
-            \Weight = currWeight
             \Tag = currTag
-            ; ----------------------------
-            ; Add AsciiDoc Tag to contents
-            ; ----------------------------
-            AddElement( \StringsL() )
-            \StringsL() = "// tag::"+ currTag + "[]"
-            LinePreview(\StringsL(), cntLine, currWeight)
+            \Weight = currWeight
+            \Subweight = currSubweight
           EndWith
+          ; ----------------------------
+          ; Update Regions's Tracker Map
+          ; ----------------------------
+          RegionsTrackM(currTag)\weight = currWeight
+          RegionsTrackM(currTag)\subweight = currSubweight
+          ; Increase counter of this region
+          RegionsTrackM(currTag)\count +1
+          ; ------------------------------
+          ; AsciiDoc Tag Open Line Preview
+          ; ------------------------------
+          ; Just show the tag in Line Previewer, don't add it to region's data.
+          LinePreview("// tag::"+ currTag + "[]", cntLine, currWeight, currSubweight)
         Else
           ; ===================
           ; Ignore Current Line
@@ -578,20 +644,19 @@ Procedure ParseFile(SrcFileName.s)
               ADocSourceEnd(currWeight)
               AddingCode = #False
             EndIf
-            ; Add AsciiDoc Tag End to contents
-            ; --------------------------------
-            With RegionsL()
-              AddElement( \StringsL() )
-              \StringsL() = "// end::"+ currTag + "[]"
-              LinePreview(\StringsL(), cntLine, currWeight)
-              If Not modifier = "<"
-                ; Add blank line to ensure ADoc contents integrity.
-                AddElement( \StringsL() )
+            ; AsciiDoc Tag End Line Preview
+            ; ------------------------------
+            LinePreview("// end::"+ currTag + "[]", cntLine, currWeight, currSubweight)
+            If Not modifier = "<"
+              ; Add blank line to ensure ADoc contents integrity.
+              With RegionsL()
+                AddElement(\StringsL())
                 \StringsL() = #Empty$
-                LinePreview(\StringsL(), cntLine, currWeight)
-              EndIf
+                LinePreview(\StringsL(), 0, currWeight, currSubweight)
+              EndWith
             EndIf
-          EndWith
+          EndIf
+          ;           EndWith ; DELME
           currTag = #Empty$
         Else
           ; ===================================
@@ -602,9 +667,9 @@ Procedure ParseFile(SrcFileName.s)
             ;- Curr Line Is Whitespace
             ;  -----------------------
             With RegionsL()
-              AddElement( \StringsL() )
+              AddElement(\StringsL())
               \StringsL() = CurrLine
-              LinePreview(\StringsL(), cntLine, currWeight)
+              LinePreview(\StringsL(), cntLine, currWeight, currSubweight)
             EndWith
           Else
             If IsAdocComment(CurrLine)
@@ -616,9 +681,9 @@ Procedure ParseFile(SrcFileName.s)
                 AddingCode = #False
               EndIf
               With RegionsL()
-                AddElement( \StringsL() )
+                AddElement(\StringsL())
                 \StringsL() = StripCommentLine(CurrLine)
-                LinePreview(\StringsL(), cntLine, currWeight)
+                LinePreview(\StringsL(), cntLine, currWeight, currSubweight)
               EndWith
             ElseIf IsSkipComment(CurrLine)
               ;  ------------------------------
@@ -634,9 +699,9 @@ Procedure ParseFile(SrcFileName.s)
                 AddingCode = #True
               EndIf
               With RegionsL()
-                AddElement( \StringsL() )
+                AddElement(\StringsL())
                 \StringsL() = CurrLine
-                LinePreview(\StringsL(), cntLine, currWeight)
+                LinePreview(\StringsL(), cntLine, currWeight, currSubweight)
               EndWith
             EndIf
           EndIf
@@ -646,11 +711,147 @@ Procedure ParseFile(SrcFileName.s)
     cntLine +1
   Wend
   CloseFile(0)
+  PrintN(LSet(#Empty$, 80, "="))
+  
+  ; ==============================================================================
+  ;-                          THE REGIONS POSTPROCESSOR                           
+  ; ==============================================================================
+  ; Now it's time to postprocess extracted regions fragments: merge same-named
+  ; regions and add AsciiDoc region tags.
+  
+  ;  =====================
+  ;- Gather Stats and Info
+  ;  =====================
+  totRegionsFrags = ListSize(RegionsL())
+  PrintN("REGIONS FRAGMENTS: " + Str(totRegionsFrags)) ; DELME
+  totUniqueRegions = MapSize(RegionsTrackM())
+  PrintN("UNIQUE REGIONS: " + Str(totUniqueRegions)) ; DELME
+  
+  ; NOTE: This is only for informational purposes, can safely delete.
+  If totRegionsFrags > totUniqueRegions
+    PrintN("Regions that need merging, and their total number of parts:")
+    cnt = 1
+    With RegionsTrackM()
+      ForEach RegionsTrackM()
+        If \count > 1
+          cnt$ = RSet(Str(cnt)+". ", 7)
+          PrintN(cnt$ + MapKey(RegionsTrackM()) + " ("+ Str(\count) +")")
+          cnt +1
+        EndIf
+      Next
+    EndWith
+  EndIf
+  ;  ==================
+  ;- SubRegions Sorting
+  ;  ==================
+  
+  ; If there are more region fragments than unique region names we need to merge
+  ; some of them. We must also set all subregions' `\weight` to the last weight
+  ; value found for that region during parsing (i.e. the value stored in
+  ; `RegionsTrackM()\weight`) because in the source there could be multiple
+  ; weight declarations for a same name region but for the final sorting to work
+  ; correctly all subregions must have equal weight.
+  
+  If totRegionsFrags > totUniqueRegions
+    PrintN("MERGING REGIONS...") ; DELME
+    
+    ; ---------------------------------------
+    ; 1. Sort regions by Tag, Asciibetically
+    ; ---------------------------------------
+    SortStructuredList(RegionsL(),
+                       #PB_Sort_Ascending,
+                       OffsetOf(RegionData\Tag), 
+                       TypeOf(RegionData\Tag))
+    ; ----------------------------------------------
+    ; 2. Get multipart-regions End and Start indices
+    ; ----------------------------------------------
+    ; Before actually sorting, we'll extract the start and end list-indices of
+    ; each named region that has subregions, and we'll sort them after iterating
+    ; through all the regions, to avoid messing up the iteration.
+    
+    ; We'll need a structured list to track these list indices:
+    Structure regionIndex
+      regionStart.i  ; index of first unique region element in RegionsL()
+      regionEnd.i    ; index of last unique region element in RegionsL()
+    EndStructure
+    
+    NewList RegionsIndexesL.regionIndex()
+    
+    ; Now that regions are asciibetically ordered, let's iterate through them:
+    ResetList(RegionsL())
+    With RegionsL()
+      While NextElement(RegionsL())
+        subRegions = RegionsTrackM(\Tag)\count
+        If subRegions > 1 ; This region has sub-regions
+          
+          ; Fix region's weight to last value encountered:
+          \Weight = RegionsTrackM()\weight
+          
+          ; Store first elements' index
+          AddElement(RegionsIndexesL())
+          RegionsIndexesL()\regionStart = ListIndex(RegionsL())
+          
+          ; Now cycle through up to last element
+          For skip=1 To subRegions -1
+            NextElement(RegionsL())
+            ; Fix region's weight to last value encountered:
+            \Weight = RegionsTrackM()\weight
+          Next
+          ; Store last elements' index
+          RegionsIndexesL()\regionEnd = ListIndex(RegionsL())
+        EndIf
+      Wend
+    EndWith
+    With RegionsIndexesL()
+      ; ----------------------------------------------
+      ; 3. Subsort same-named regions by subWeight
+      ; ----------------------------------------------
+      ForEach RegionsIndexesL()
+        
+        SortStructuredList(RegionsL(), #PB_Sort_Ascending,
+                           OffsetOf(RegionData\Subweight),
+                           TypeOf(RegionData\Subweight),
+                           \regionStart, \regionEnd)
+      Next
+    EndWith  
+  Else
+    PrintN("NO REGIONS MERGING REQUIRED") ; DELME
+  EndIf
+  ;  ===============
+  ;- Add Region Tags
+  ;  ===============
+  PrintN(LSet("", 20, "-"))
+  
+  With RegionsL()
+    ResetList(RegionsL())
+    While NextElement(RegionsL())
+      ; -----------------------------
+      ; Add AsciiDoc Region Begin Tag
+      ; -----------------------------
+      FirstElement(\StringsL())
+      InsertElement(\StringsL())
+      \StringsL() = "// tag::"+ \Tag + "[]"
+      ; ----------------------
+      ; Skip to Last SubRegion
+      ; ----------------------
+      ; subRegions = RegionsTrackM(\Tag)\count - 1
+      ; For skip = 1 To subRegions
+      For skip = 1 To RegionsTrackM(\Tag)\count - 1
+        NextElement(RegionsL())
+      Next
+      ; ---------------------------
+      ; Add AsciiDoc Region End Tag
+      ; ---------------------------
+      LastElement(\StringsL())
+      AddElement(\StringsL())
+      \StringsL() = "// end::"+ \Tag + "[]"
+    Wend
+  EndWith 
+  
   ;  ============
   ;- Sort Regions
   ;  ============
   SortStructuredList(RegionsL(), #PB_Sort_Ascending, OffsetOf(RegionData\Weight), TypeOf(RegionData\Weight))
-  PrintN( LSet(#Empty$, 80, "=") )
   
 EndProcedure
 ; ------------------------------------------------------------------------------
@@ -685,17 +886,17 @@ Procedure ADocSourceStart(weight = 0)
   
   With RegionsL()
     
-    AddElement( \StringsL() )
+    AddElement(\StringsL())
     \StringsL() = #Empty$
-    LinePreview( \StringsL(), 0, weight)
+    LinePreview(\StringsL(), 0, weight)
     
-    AddElement( \StringsL() )
+    AddElement(\StringsL())
     \StringsL() = "[source,purebasic]"
-    LinePreview( \StringsL(), 0, weight)
+    LinePreview(\StringsL(), 0, weight)
     
-    AddElement( \StringsL() )
+    AddElement(\StringsL())
     \StringsL() = LSet(#Empty$, #SourceDelimiterLen, "-")
-    LinePreview( \StringsL(), 0, weight)
+    LinePreview(\StringsL(), 0, weight)
     
   EndWith
   
@@ -707,13 +908,13 @@ Procedure ADocSourceEnd(weight = 0)
   Shared RegionsL()
   With RegionsL()
     
-    AddElement( \StringsL() )
+    AddElement(\StringsL())
     \StringsL() = LSet(#Empty$, #SourceDelimiterLen, "-")
-    LinePreview( \StringsL(), 0, weight)
+    LinePreview(\StringsL(), 0, weight)
     
-    AddElement( \StringsL() )
+    AddElement(\StringsL())
     \StringsL() = #Empty$
-    LinePreview( \StringsL(), 0, weight)
+    LinePreview(\StringsL(), 0, weight)
     
   EndWith
   
@@ -727,7 +928,7 @@ Procedure Abort(ErrMsg.s)
   
 EndProcedure
 ; ------------------------------------------------------------------------------
-Procedure.s LinePreview(text.s, LineNum = 0, weight = 0)
+Procedure.s LinePreview(text.s, LineNum = 0, weight = 0, subweight = 0)
   ;{-------------------------------------------------------------------
   ; Print a preview of the ADoc line, with well formated linenumber and
   ; tagged region's weight.
@@ -738,42 +939,51 @@ Procedure.s LinePreview(text.s, LineNum = 0, weight = 0)
   ;|
   ;| During execution, Doxter will output to the console a preview of the parsed
   ;| lines that belong to tagged regions, showing their ADoc processed version,
-  ;| together with extra lines added by the parser (eg. source code delimiters).
-  ;| This feature is very useful to visually trace the source of problems when
-  ;| the ouput results are not as intendend, as the log shows in a human friendly
-  ;| format the various steps of Doxter's parsers.
-  ;|
+  ;| together with extra lines added by the parser (eg. source code delimiters,
+  ;| blank lines, etc).
+
+  ;| Although the shown lines are just an aproximation of the final document (the
+  ;| regions will be postprocessed, merged and reoderdered before writing them to
+  ;| file), this feature is very useful to visually trace the source of problems
+  ;| when the ouput results are not as intendend, as the log provides a human
+  ;| friendly insight into Doxter's parser.
+
   ;| Here's an example of how the console output looks like:
+
   ;|
   ;| ----------------------------------------------------------
-  ;| |0005|   28|// tag::my_example[]
-  ;| |0006|   28|For example, the following code from `test.pb`:
-  ;| |    |   28|
-  ;| |    |   28|[source,purebasic]
-  ;| |    |   28|--------------------------------------------------------------------------------
-  ;| |0007|   28|For i=1 To 5
-  ;| |0008|   28|  Debug i
-  ;| |0009|   28|Next
+  ;||0099|4100|   1|region tag, which would split the text in multiple paragraphs in the final <1>
+  ;||0100|4100|   1|document.
+  ;||0101|4100|   1|// end::Comments_Marks[] <2>
+  ;||    |4100|   1| <3>
+  ;||0169|4101|  10|// tag::CLI_Usage[] <4>
+  ;||0170|4101|  10|=== Command Line Options
   ;| ----------------------------------------------------------
   ;|
-  ;| The first column indicated the line number in the original source that is
-  ;| being shown; the absence of line number indicated that what you are seeing
-  ;| on the right hand side is a line generated by Doxter, and added to the output
-  ;| document for formatting purposes (in the above example, the opening of a
-  ;| PureBasic source code block in AsciiDoc markup after line 6).
+  ;| <1> Continuation lines of a region with weight `4100` and subweight `1`.
+  ;| <2> AsciiDoc tagged region `end::` generated by Doxter when it encountered
+  ;|     a `;<` marker.
+  ;| <3> Blank line added by Doxter; note that there is no corresponing line
+  ;|     number, for it is not found in the source file.
+  ;| <4> Region Being marker found ad line 169, with wieght `4101` and sebweight
+  ;|     `10` (probably the continuation of a fragmented region).
+
+  ;| There are four columns in the preview, representing the line number in the
+  ;| source file, the region's weight, its subweight, and a preview of the line
+  ;| converted to AsciiDoc.
+
   ;|
-  ;| The second column indicates the weight of the current tagged region being
-  ;| processed (except for Header lines, which show the text `head` instead). In
-  ;| the above example the region being shown has a weight of 28.
+  ;| The absence of line number in the first column indicates that what you are
+  ;| seeing on the right hand side is a line generated by Doxter, and added to
+  ;| the output document for formatting purposes (e.g. a blank line, source code
+  ;| block delimiters, etc.).
+ 
   ;| The weight colum is very useful when looking at the logged output for it
   ;| allows to easily spot where regions start and end, as each region should
   ;| have a different weight (although not mandatory).
-  ;|
-  ;| Finally, the third and last columns show the transformed parsed line, i.e.
-  ;| how the line will be stored in the final AsciiDoc document.
-  ;| At line `0005` of the above example we can see the AsciiDoc region tag
-  ;| ce code block in AsciiDoc  by Doxter after parsing `;>my_example(28)` in
-  ;| the original source file, at the same line number.
+  ;| Header lines will always show the text `head` in the second and third
+  ;| columns, instead of numbers, because the Header has no weight or subweight.
+
   ;}<---------------------------------------------------------------------------
   If LineNum = 0
     LineNum$ = Space(#LineNumDigits)
@@ -787,7 +997,13 @@ Procedure.s LinePreview(text.s, LineNum = 0, weight = 0)
     weight$ = RSet(Str(weight), #WeightsDigits, " ")
   EndIf
   
-  PrintN("|" + LineNum$ + "|" + weight$ +"|" + text)
+  If subweight = 0
+    subweight$ = Space(#WeightsDigits)
+  Else
+    subweight$ = RSet(Str(subweight), #WeightsDigits, " ")
+  EndIf
+  
+  PrintN("|" + LineNum$ + "|" + weight$ +"|" + subweight$ +"|" + text)
 EndProcedure
 ; ------------------------------------------------------------------------------
 Procedure.s HeaderLinePreview(text.s, LineNum = 0)
@@ -803,7 +1019,7 @@ Procedure.s HeaderLinePreview(text.s, LineNum = 0)
   
   weight$ = Left("header", #WeightsDigits)
   
-  PrintN("|" + LineNum$ + "|" + weight$ +"|" + text)
+  PrintN("|" + LineNum$ + "|" + weight$ +"|" + weight$ +"|" + text)
   
 EndProcedure
 
@@ -817,7 +1033,7 @@ EndProcedure
 ;                                     INTRO
 ;{==============================================================================
 
-;>intro(1000)
+;>intro(1000.1)
 
 ;| == About Doxter
 
@@ -880,10 +1096,53 @@ EndProcedure
 
 ;| === Cross Documents Selective Inclusions
 ;|
+
 ;| Every tagged region in the source file becomes an AsciiDoc tagged region in
-;| the output document. This is a very practical feature for it allows other
-;| AsciiDoc documents to selectively include parts of a source file's documentation
-;| using tag filtering.
+;| the output document. The following PureBasic source comments contain a simple
+;| Doxter region:
+
+;| [source,purebasic]
+;| -----------------------------------------------------------------------------
+;| ;>
+;| ;| I'm a Doxter _region_. 
+;| ;<
+;| -----------------------------------------------------------------------------
+
+;| \... which, in the final document, Doxter will render as AsciiDoc:
+
+;| -----------------------------------------------------------------------------
+;| // tag::region1[]
+;| I'm a Doxter _region_.
+;| 
+;| // end::region1[]
+;| -----------------------------------------------------------------------------
+
+
+;| Regions can be named in the source file, by providing an identifier after the
+;| `;>` marker, allowing you to control regions' tag names in the AsciiDoc output:
+
+;| [source,purebasic]
+;| -----------------------------------------------------------------------------
+;| ;>intro
+;| ;| == Introduction
+;| ;| 
+;| ;| This a _named_ region.
+;| ;<
+;| -----------------------------------------------------------------------------
+
+;| -----------------------------------------------------------------------------
+;| // tag::intro[]
+;| == Introduction
+;| 
+;| This a _named_ region.
+;| 
+;| // end::intro[]
+;| -----------------------------------------------------------------------------
+
+
+;| This is a very practical feature for it allows other AsciiDoc documents to
+;| selectively include parts of a source file's documentation using tag filtering.
+
 ;| For example, when documenting an application that relies on imported Modules,
 ;| the main document can selectively include regions from the Doxter-generated
 ;| modules' documentation, thus allowing to maintain both independent documentation
@@ -895,9 +1154,128 @@ EndProcedure
 ;| Each tagged region in the PB source can be assigned a weight, so that in the
 ;| final document the regions will be reordered in a specific way, forming a well
 ;| structured document that presents contents in the right order.
+
+;| [source,purebasic]
+;| -----------------------------------------------------------------------------
+;| ;>sec1(200)
+;| ;| == Section One
+;| ;| 
+;| ;| And this is Sec 1.
+;| ;<
+;| For i= 1 To 10 
+;|   Debug "i = " + Str(i)
+;| Next
+;| ;>premise(100)
+;| ;| == Premise
+;| ;| 
+;| ;| This is an opening premise.
+;| ;<
+;| -----------------------------------------------------------------------------
+
+;| -----------------------------------------------------------------------------
+;| // tag::premise[]
+;| == Premise
+;| 
+;| This is an opening premise.
+;| 
+;| // end::premise[]
+;| // tag::sec1[]
+;| == Section One
+;| 
+;| And this is Sec 1.
+;| 
+;| // end::sec1[]
+;| -----------------------------------------------------------------------------
+
+
 ;| This feature allows to keep each paragraph near the code lines that it
 ;| discusses, making the source code more readable and freeing the documentation
 ;| from the constraints imposed by the order in which the code is organized.
+;|
+
+;| Furthermore, regions with same tag names in the source code will be merged
+;| into a single region in the final document. Each region's fragment (aka
+;| subregion) can be assigned a subweight which will be used to sort the order of
+;| the fragments before merging them together. This allows you to control the
+;| number of regions in the final document, and keep related topics under a same
+;| region.
+
+;| In the following example:
+
+;| [source,purebasic]
+;| -----------------------------------------------------------------------------
+;| ;>even_macro_intro(.2)
+;| ;| The following macro performs a bitwise AND operation to determine if an
+;| ;| integer is even or not.
+;| Macro IsEven(num)
+;|   (num & 1 = 0)  
+;| EndMacro
+;| ;<
+;| 
+;| ;>macro_test(200)
+;| ;| Let's test that the macro actually works as expected.
+;| For i = 1 To 5
+;|   If isEven(i)
+;|     Debug Str(i) +" is even."
+;|   Else
+;|     Debug Str(i) +" is odd."
+;|   EndIf
+;| Next
+;| ;<
+;| 
+;| ;>even_macro_intro(100.1)
+;| ;| === The IsEven Macro
+;| ;| 
+;| ;| Using bitwise operations insted of modulo (`%`) is much _much_ faster -- in
+;| ;| the order of hundreds of times faster! 
+;| ;<
+;| ;>even_macro_intro(.3)
+;| ;| This works because `IsEven = ((i % 2) = 0)` equals `IsEven = ((i & 1) = 0)`.
+;| ;<
+;| -----------------------------------------------------------------------------
+
+;| \... all the regions named `even_macro_intro` are merged into a single region
+;| after being sorted according to ther subeweights (`.1`, `.2` and `.3`):
+
+;| -----------------------------------------------------------------------------
+;| // tag::even_macro_intro[]
+;| === The IsEven Macro
+;| 
+;| Using bitwise operations insted of modulo (`%`) is much _much_ faster -- in
+;| the order of hundreds of times faster! 
+;| 
+;| The following macro performs a bitwise AND operation to determine if an
+;| integer is even or not.
+;| 
+;| [source,purebasic]
+;| --------------------------------------------------------------------------------
+;| Macro IsEven(num)
+;|   (num & 1 = 0)  
+;| EndMacro
+;| --------------------------------------------------------------------------------
+;| 
+;| 
+;| This works because `IsEven = ((i % 2) = 0)` equals `IsEven = ((i & 1) = 0)`.
+;| 
+;| // end::even_macro_intro[]
+;| // tag::macro_test[]
+;| Let's test that the macro actually works as expected.
+;| 
+;| [source,purebasic]
+;| --------------------------------------------------------------------------------
+;| For i = 1 To 5
+;|   If isEven(i)
+;|     Debug Str(i) +" is even."
+;|   Else
+;|     Debug Str(i) +" is odd."
+;|   EndIf
+;| Next
+;| --------------------------------------------------------------------------------
+;| 
+;| 
+;| // end::macro_test[]
+;| -----------------------------------------------------------------------------
+
 ;|
 ;| Keep your comments next to the code they belong to, allowing the source file
 ;| to follow its natural course and provide meaningful snippets of in-code
@@ -919,6 +1297,41 @@ EndProcedure
 ;| Any source code (i.e. non-AsciiDoc comments) inside a tagged region will be
 ;| rendered in the final document inside an AsciiDoc source block, with PureBasic
 ;| set as its language.
+
+;| [source,purebasic]
+;| -----------------------------------------------------------------------------
+;| ;>macro_test(200)
+;| ;| Let's test that the macro actually works as expected.
+;| For i = 1 To 5
+;|   If isEven(i)
+;|     Debug Str(i) +" is even."
+;|   Else
+;|     Debug Str(i) +" is odd."
+;|   EndIf
+;| Next
+;| ;<
+;| -----------------------------------------------------------------------------
+
+
+;| -----------------------------------------------------------------------------
+;| // tag::macro_test[]
+;| Let's test that the macro actually works as expected.
+;| 
+;| [source,purebasic]
+;| --------------------------------------------------------------------------------
+;| For i = 1 To 5
+;|   If isEven(i)
+;|     Debug Str(i) +" is even."
+;|   Else
+;|     Debug Str(i) +" is odd."
+;|   EndIf
+;| Next
+;| --------------------------------------------------------------------------------
+;| 
+;| 
+;| // end::macro_test[]
+;| -----------------------------------------------------------------------------
+
 ;<
 
 ;}==============================================================================
@@ -934,11 +1347,11 @@ EndProcedure
 ;| system `PATH` environment variable.
 ;<
 
-; 3200 === Command Line Options
-; 3300 === Input File Validation [extensions]
-; 3320     [check file exists, is not dir or 0kb]
-; 3330     [output file depending on AsciiDoc header]
-; 3500 === Parsing Live Preview During Execution
+; * CLI_Usage             |    |  10| === Command Line Options
+; * Input_File_Validation |3300|   1| === Input File Validation [extensions]
+; * Input_File_Validation |    |auto|     [check file exists, is not dir or 0kb]
+; * Output_File           |3330|   1|     [output file depending on AsciiDoc header]
+; * Parser_Live_Preview   |3500|    | === Parsing Live Preview During Execution
 
 ;}==============================================================================
 ; 4000                         DOCUMENTING HOW-TOS
@@ -953,7 +1366,7 @@ EndProcedure
 ;|
 ;<
 
-; 4100 === Doxter Markers Primer
+; * Comments_Marks |4100| === Doxter Markers Primer
 
 ;>Comments_Marks_Considerations(4110)
 ;| That's about all you'll have to learn: memorize those five base symbols, their
@@ -982,7 +1395,7 @@ EndProcedure
 ;| its markers.
 ;<
 
-; 4210 : [two steps parsing]
+; * two_steps_parsing |4210|    | : [two steps parsing]
 
 ;>The_Parser_continue(4220)
 ;| Each of these parsers obeys its own rules, and the way they interpret the
@@ -990,10 +1403,10 @@ EndProcedure
 ;| Here follow the simple rules by which each parser abides.
 ;<
 
-; 4230 == Header Parser Rules
-; 4240 == Regions Parser Rules
-; 4242    [Regions Parser Modalities]
-; 4244    [Regions Parser Rules2]
+; * Header_Parser_Rules       |4230| == Header Parser Rules
+; * Regions_Parser_Rules1     |4240| == Regions Parser Rules
+; * Regions_Parser_Modalities |4242|    [Regions Parser Modalities]
+; * Regions_Parser_Rules2     |4244|    [Regions Parser Rules2]
 
 ;>The_Parser_Final_Notes(4250)
 ;| The above rules are going to be a useful reference when you've began learning
@@ -1072,14 +1485,9 @@ EndProcedure
 ;| The full syntax of a Tag Region Begin mark is:
 ;|
 ;| --------------------------
-;| ;>tagname(<region weight>)
+;| ;>tagname(<region weight>.<region subweight>)
 ;| --------------------------
 ;|
-;| … where `tagname` is a unique identifier for the tagged region, and
-;| `<region weight>` is an integer number. Both of them are optional, and if
-;| you don't supply them Doxter will, using the default Tag ID `region` followed
-;| by an incremental counter, and will assign as weight the value of the last
-;| encountered weight plus one.
 ;}<---------------------------------------------------------------------------
 
 ;{>WIP(4999)
@@ -1154,8 +1562,26 @@ EndProcedure
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
-;| * v0.1.2-alpha (2018/09/25) -- Aesthetic changes.
-;| * v0.1.1-alpha (2018/09/25) -- Created Doxter repository on GitHub.
-;| * v0.1.0-alpha (2018/09/21) -- First public released Alpha:
+;| * *v0.1.3-alpha* (2018/09/29) -- Doxter engine improved:
+;| ** PureBasic special comments markers (`;{`, `;}` and `;-`) can now be used
+;|    in all Doxter markers, except ADoc Header (`;=`).
+;| ** Regions merging feature introduced:
+;| *** Tagged regions with same tag identifier are merged into a single region
+;|      in the output document:
+;| **** All region fragments will be sorted by subweight before merging.
+;| *** Region subweight:
+;| **** New subweight parameter (optional) introduced in Region Begin marker,
+;|      (e.g. `;>tag(100.99`)` or `;>(.99)`, where subweight is `99`).
+;| **** If the marker doesn't provide a subweight, the last subweight value used
+;|      with that tag will be automatically employed after incrementing it by 1.
+;| *** When a weightless Region Begin marker is encountered, if a region with
+;|     the same tag already exists, that region's weight will be used for the
+;|     new region fragment, otherwise it will be given weight 1.
+;| *** If multiple weight definitions are given for a same region tag, the last
+;|     one encountered will override the previous ones.
+;| ** Parsing Live Preview now shows subweight in new third column.
+;| * *v0.1.2-alpha* (2018/09/25) -- Aesthetic changes.
+;| * *v0.1.1-alpha* (2018/09/25) -- Created Doxter repository on GitHub.
+;| * *v0.1.0-alpha* (2018/09/21) -- First public released Alpha:
 ;| https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb
 ;}<

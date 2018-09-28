@@ -1,6 +1,6 @@
 = Doxter: Docs-Generator from PB Sources.
 Tristano Ajmone, <tajmone@gmail.com>
-v0.1.2-alpha, September 25, 2018: Public Alpha
+v0.1.3-alpha, September 29, 2018: Public Alpha
 :License: MIT License
 :PureBASIC: 5.62
 :toclevels: 3
@@ -17,8 +17,8 @@ Released under <<License,MIT License>>.
 
 https://github.com/tajmone/doxter
 =============================================================================
-// end::description[]
 
+// end::description[]
 // tag::intro[]
 
 == About Doxter
@@ -42,8 +42,8 @@ require a complex setup envolving lot's of dependencies.
 
 Doxter was designed to work with PureBasic, leveraging the power of AsciiDoc
 and with simplicity in mind.
-// end::intro[]
 
+// end::intro[]
 // tag::who_needs[]
 
 === Who Needs Doxter?
@@ -53,8 +53,8 @@ documentation of his/her code directly in the source files can benefit from
 Doxter by automating the task of producing always up-to-date documentation
 in various formats (HTML5, man pages, PDF, and any other format supported by
 AsciDoc conversion backends).
-// end::who_needs[]
 
+// end::who_needs[]
 // tag::acknowledgements[]
 
 === Acknowledgements
@@ -66,8 +66,8 @@ similar, but exploiting AsciiDoc tagged regions instead.
 
 My gratitude to http://lou.wtf/[Lou Acresti^] (aka https://github.com/namuol[@namuol^])
 for having created such an inspiring tool like Cod.
-// end::acknowledgements[]
 
+// end::acknowledgements[]
 // tag::Features[]
 == Features
 
@@ -79,10 +79,53 @@ Asciidoctor (Ruby).
 
 === Cross Documents Selective Inclusions
 
+
 Every tagged region in the source file becomes an AsciiDoc tagged region in
-the output document. This is a very practical feature for it allows other
-AsciiDoc documents to selectively include parts of a source file's documentation
-using tag filtering.
+the output document. The following PureBasic source comments contain a simple
+Doxter region:
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>
+;| I'm a Doxter _region_. 
+;<
+-----------------------------------------------------------------------------
+
+\... which, in the final document, Doxter will render as AsciiDoc:
+
+-----------------------------------------------------------------------------
+// tag::region1[]
+I'm a Doxter _region_.
+
+// end::region1[]
+-----------------------------------------------------------------------------
+
+
+Regions can be named in the source file, by providing an identifier after the
+`;>` marker, allowing you to control regions' tag names in the AsciiDoc output:
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>intro
+;| == Introduction
+;| 
+;| This a _named_ region.
+;<
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+// tag::intro[]
+== Introduction
+
+This a _named_ region.
+
+// end::intro[]
+-----------------------------------------------------------------------------
+
+
+This is a very practical feature for it allows other AsciiDoc documents to
+selectively include parts of a source file's documentation using tag filtering.
+
 For example, when documenting an application that relies on imported Modules,
 the main document can selectively include regions from the Doxter-generated
 modules' documentation, thus allowing to maintain both independent documentation
@@ -94,9 +137,128 @@ parts from the modules' docs in a self-updating fashion.
 Each tagged region in the PB source can be assigned a weight, so that in the
 final document the regions will be reordered in a specific way, forming a well
 structured document that presents contents in the right order.
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>sec1(200)
+;| == Section One
+;| 
+;| And this is Sec 1.
+;<
+For i= 1 To 10 
+  Debug "i = " + Str(i)
+Next
+;>premise(100)
+;| == Premise
+;| 
+;| This is an opening premise.
+;<
+-----------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------
+// tag::premise[]
+== Premise
+
+This is an opening premise.
+
+// end::premise[]
+// tag::sec1[]
+== Section One
+
+And this is Sec 1.
+
+// end::sec1[]
+-----------------------------------------------------------------------------
+
+
 This feature allows to keep each paragraph near the code lines that it
 discusses, making the source code more readable and freeing the documentation
 from the constraints imposed by the order in which the code is organized.
+
+
+Furthermore, regions with same tag names in the source code will be merged
+into a single region in the final document. Each region's fragment (aka
+subregion) can be assigned a subweight which will be used to sort the order of
+the fragments before merging them together. This allows you to control the
+number of regions in the final document, and keep related topics under a same
+region.
+
+In the following example:
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>even_macro_intro(.2)
+;| The following macro performs a bitwise AND operation to determine if an
+;| integer is even or not.
+Macro IsEven(num)
+  (num & 1 = 0)  
+EndMacro
+;<
+
+;>macro_test(200)
+;| Let's test that the macro actually works as expected.
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+;<
+
+;>even_macro_intro(100.1)
+;| === The IsEven Macro
+;| 
+;| Using bitwise operations insted of modulo (`%`) is much _much_ faster -- in
+;| the order of hundreds of times faster! 
+;<
+;>even_macro_intro(.3)
+;| This works because `IsEven = ((i % 2) = 0)` equals `IsEven = ((i & 1) = 0)`.
+;<
+-----------------------------------------------------------------------------
+
+\... all the regions named `even_macro_intro` are merged into a single region
+after being sorted according to ther subeweights (`.1`, `.2` and `.3`):
+
+-----------------------------------------------------------------------------
+// tag::even_macro_intro[]
+=== The IsEven Macro
+
+Using bitwise operations insted of modulo (`%`) is much _much_ faster -- in
+the order of hundreds of times faster! 
+
+The following macro performs a bitwise AND operation to determine if an
+integer is even or not.
+
+[source,purebasic]
+--------------------------------------------------------------------------------
+Macro IsEven(num)
+  (num & 1 = 0)  
+EndMacro
+--------------------------------------------------------------------------------
+
+
+This works because `IsEven = ((i % 2) = 0)` equals `IsEven = ((i & 1) = 0)`.
+
+// end::even_macro_intro[]
+// tag::macro_test[]
+Let's test that the macro actually works as expected.
+
+[source,purebasic]
+--------------------------------------------------------------------------------
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+--------------------------------------------------------------------------------
+
+
+// end::macro_test[]
+-----------------------------------------------------------------------------
+
 
 Keep your comments next to the code they belong to, allowing the source file
 to follow its natural course and provide meaningful snippets of in-code
@@ -118,17 +280,43 @@ document.
 Any source code (i.e. non-AsciiDoc comments) inside a tagged region will be
 rendered in the final document inside an AsciiDoc source block, with PureBasic
 set as its language.
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>macro_test(200)
+;| Let's test that the macro actually works as expected.
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+;<
+-----------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------
+// tag::macro_test[]
+Let's test that the macro actually works as expected.
+
+[source,purebasic]
+--------------------------------------------------------------------------------
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+--------------------------------------------------------------------------------
+
+
+// end::macro_test[]
+-----------------------------------------------------------------------------
+
+
 // end::Features[]
-
-// tag::CLI_Usage[]
-== Command Line Usage
-
-Doxter is a binary console application (a compiled executable).
-There is no installation, just place the binary file (`Doxter.exe` on Windows)
-in your working folder, or make it availabe system-wide by adding it to the
-system `PATH` environment variable.
-// end::CLI_Usage[]
-
 // tag::CLI_Usage[]
 === Command Line Options
 
@@ -139,9 +327,16 @@ doxter <sourcefile>
 --------------------
 
 … where `<sourcefile>` is a PureBasic or SpiderBasic source file.
-// end::CLI_Usage[]
 
-// tag::Validate_File_Extension[]
+== Command Line Usage
+
+Doxter is a binary console application (a compiled executable).
+There is no installation, just place the binary file (`Doxter.exe` on Windows)
+in your working folder, or make it availabe system-wide by adding it to the
+system `PATH` environment variable.
+
+// end::CLI_Usage[]
+// tag::Input_File_Validation[]
 === Input File Validation
 
 Doxter checks that the passed `<sourcefile>` parameter has a valid extension:
@@ -153,13 +348,11 @@ Doxter checks that the passed `<sourcefile>` parameter has a valid extension:
 
 If the file extension doesn't match, Doxter will report an error and abort
 with Status Error 1.
-// end::Validate_File_Extension[]
 
-// tag::File_Checks[]
 Doxter will also check that the file exists, it's not a directory, and it's
 not 0 Kb in size; and abort with Status Error if any of these are met.
-// end::File_Checks[]
 
+// end::Input_File_Validation[]
 // tag::Output_File[]
 
 Depending on whether the source file contains or not an <<AsciiDoc Header>>,
@@ -181,52 +374,61 @@ document Header in a source file for it to be buildable as a standalone
 doc; and with the common practice of splitting large documents in smaller
 files, which are then imported into the main document and therefore don't
 need a Header of their own.
-// end::Output_File[]
 
+// end::Output_File[]
 // tag::Parser_Live_Preview[]
 
 === Parsing Live Preview During Execution
 
 During execution, Doxter will output to the console a preview of the parsed
 lines that belong to tagged regions, showing their ADoc processed version,
-together with extra lines added by the parser (eg. source code delimiters).
-This feature is very useful to visually trace the source of problems when
-the ouput results are not as intendend, as the log shows in a human friendly
-format the various steps of Doxter's parsers.
+together with extra lines added by the parser (eg. source code delimiters,
+blank lines, etc).
+
+Although the shown lines are just an aproximation of the final document (the
+regions will be postprocessed, merged and reoderdered before writing them to
+file), this feature is very useful to visually trace the source of problems
+when the ouput results are not as intendend, as the log provides a human
+friendly insight into Doxter's parser.
 
 Here's an example of how the console output looks like:
 
+
 ----------------------------------------------------------
-|0005|   28|// tag::my_example[]
-|0006|   28|For example, the following code from `test.pb`:
-|    |   28|
-|    |   28|[source,purebasic]
-|    |   28|--------------------------------------------------------------------------------
-|0007|   28|For i=1 To 5
-|0008|   28|  Debug i
-|0009|   28|Next
+|0099|4100|   1|region tag, which would split the text in multiple paragraphs in the final <1>
+|0100|4100|   1|document.
+|0101|4100|   1|// end::Comments_Marks[] <2>
+|    |4100|   1| <3>
+|0169|4101|  10|// tag::CLI_Usage[] <4>
+|0170|4101|  10|=== Command Line Options
 ----------------------------------------------------------
 
-The first column indicated the line number in the original source that is
-being shown; the absence of line number indicated that what you are seeing
-on the right hand side is a line generated by Doxter, and added to the output
-document for formatting purposes (in the above example, the opening of a
-PureBasic source code block in AsciiDoc markup after line 6).
+<1> Continuation lines of a region with weight `4100` and subweight `1`.
+<2> AsciiDoc tagged region `end::` generated by Doxter when it encountered
+    a `;<` marker.
+<3> Blank line added by Doxter; note that there is no corresponing line
+    number, for it is not found in the source file.
+<4> Region Being marker found ad line 169, with wieght `4101` and sebweight
+    `10` (probably the continuation of a fragmented region).
 
-The second column indicates the weight of the current tagged region being
-processed (except for Header lines, which show the text `head` instead). In
-the above example the region being shown has a weight of 28.
+There are four columns in the preview, representing the line number in the
+source file, the region's weight, its subweight, and a preview of the line
+converted to AsciiDoc.
+
+
+The absence of line number in the first column indicates that what you are
+seeing on the right hand side is a line generated by Doxter, and added to
+the output document for formatting purposes (e.g. a blank line, source code
+block delimiters, etc.).
+ 
 The weight colum is very useful when looking at the logged output for it
 allows to easily spot where regions start and end, as each region should
 have a different weight (although not mandatory).
+Header lines will always show the text `head` in the second and third
+columns, instead of numbers, because the Header has no weight or subweight.
 
-Finally, the third and last columns show the transformed parsed line, i.e.
-how the line will be stored in the final AsciiDoc document.
-At line `0005` of the above example we can see the AsciiDoc region tag
-ce code block in AsciiDoc  by Doxter after parsing `;>my_example(28)` in
-the original source file, at the same line number.
+
 // end::Parser_Live_Preview[]
-
 // tag::Documenting_Source[]
 == Documenting Your Source Files
 
@@ -234,9 +436,10 @@ Now comes the juicy part, how to incorporate documentation into you source
 files. The good news is that the system employed by Doxter is very easy to
 learn and simple to use.
 
-// end::Documenting_Source[]
 
+// end::Documenting_Source[]
 // tag::Comments_Marks[]
+
 === Doxter Markers Primer
 
 The way Doxter decides which parts of your sorce code to treat as documentation
@@ -254,23 +457,21 @@ markers:
 ¦ ;< ¦ Region End   ¦ Marks end of a tagged region.
 |============================================================================
 
-The *Tagged Region* marker can also include PureBasic's foldable comments
-delimiters:
+[NOTE]
+=============================================================================
+You can freely use PureBasic's special comments marks (`;{`/;`}`/`;-`) within
+Doxter's markers (e.g. `;{>`, `;}~`, `;-|`, etc.) execpt in the ADoc Header
+marker, which must be `;=`.
+This allows you to create regions which are foldable in PureBasic IDE.
+=============================================================================
 
-.Region Markers Variants
-[cols="7m,98d"]
-|============================
-| ;{> | Foldable Region Begin
-| ;}< | Foldable Region End
-|============================
-
-The *Tagged Region End* marker has an alternative syntax to tell Doxter no to
-add an empty line after closing the region:
+The *Tagged Region End* marker has an alternative syntax to prevent Doxter
+from adding an empty line after closing the region:
 
 .Region Markers Modifiers
-[cols="2*7m,20d,66d"]
+[cols="7m,20d,66d"]
 |============================================================================
-| ;<< | ;}<< | Unspaced Region End | Don't add empty line after closing tag.
+| ;<< | Unspaced Region End | Don't add empty line after closing tag.
 |============================================================================
 
 This is useful when splitting a paragraph across multiple regions, in order to
@@ -278,8 +479,8 @@ keep its text lines next to the code they belong to. Without the `<` modifier,
 Doxter's default behavior would be to add an empty line after the closing
 region tag, which would split the text in multiple paragraphs in the final
 document.
-// end::Comments_Marks[]
 
+// end::Comments_Marks[]
 // tag::Comments_Marks_Considerations[]
 That's about all you'll have to learn: memorize those five base symbols, their
 variannts and modifiers, and learn how to use them correctly and wisely.
@@ -294,16 +495,16 @@ But as you shall see, these five simple markers empower you with great freedom
 to document your source code. Thanks to some simple rules devised on common
 sense expectations of how text and source code should blend in documentation,
 Doxter will parse smartly your source files, with little effort on your side.
-// end::Comments_Marks_Considerations[]
 
+// end::Comments_Marks_Considerations[]
 // tag::The_Parser[]
 === Doxter's Parser
 
 Understanding how Doxter's parser works will help you grasp a clearer picture
 of how source files are processed, and gain insight into the proper use of
 its markers.
-// end::The_Parser[]
 
+// end::The_Parser[]
 // tag::two_steps_parsing[]
 Doxter uses a two-steps parsing approach when processing documents:
 
@@ -315,14 +516,14 @@ Doxter uses a two-steps parsing approach when processing documents:
 
 These are two different parsers altogether, and Doxter always runs the fed
 source file against both of them, in the exact order specified above.
-// end::two_steps_parsing[]
 
+// end::two_steps_parsing[]
 // tag::The_Parser_continue[]
 Each of these parsers obeys its own rules, and the way they interpret the
 comment markers (or ignore them) is slightly different.
 Here follow the simple rules by which each parser abides.
-// end::The_Parser_continue[]
 
+// end::The_Parser_continue[]
 // tag::Header_Parser_Rules[]
 
 ==== Header Parser Rules
@@ -334,19 +535,19 @@ AsciiDoc Header and, if there is one, extract it and store it in memory.
   leading space allowed):
 ** *No*? Reset file pointer position to beginning of file and relinquish
    control to the Regions Parser. (Quit Parsing)
-** *Yes*? Then an AsciiDoc Header was found; strip away the `;` and store the
-   line in the Header's data storage, then:
+** *Yes*? Then an AsciiDoc Header was found; strip away the `;` and store
+   the line in the Header's data storage, then:
 *** (_loop entrypoint_) Store current file position pointer and parse the
     next line:
-**** If an ADoc Comment line (`;|`) is found, strip it of the marker and add
-     it to Header's data storage, then carry on with parsing loop.
+**** If an ADoc Comment line (`;|`) is found, strip it of the marker and
+     add it to Header's data storage, then carry on with parsing loop.
 **** If a Skip Comment line (`;~`) is found, ignore it and carry on with
      parsing loop.
 **** If the parsed line is none of the above, restore previous file position
      from stored pointer and relinquish control to the Regions Parser.
      (Exit Loop, Quit Parsing)
-// end::Header_Parser_Rules[]
 
+// end::Header_Parser_Rules[]
 // tag::Regions_Parser_Rules1[]
 
 ==== Regions Parser Rules
@@ -354,8 +555,8 @@ AsciiDoc Header and, if there is one, extract it and store it in memory.
 The task of the *Regions Parser* is to extract and process all lines that
 are enclosed between Region Start and Region End tags, and store them in
 memory.
-// end::Regions_Parser_Rules1[]
 
+// end::Regions_Parser_Rules1[]
 // tag::Regions_Parser_Modalities[]
 The *Regions Parser* alternates between two mutually exclusive modalities:
 _Seeking_, and _InsideRegion_.
@@ -377,8 +578,8 @@ the region, as opposed to ADoc comment lines, for in the final document
 source code must be enclosed in an AsciiDoc source block, using source
 delimiters and setting the syntax to PureBasic. This will ensure that code
 is shown as a verbatim block and enable syntax highlighting (if supported).
-// end::Regions_Parser_Modalities[]
 
+// end::Regions_Parser_Modalities[]
 // tag::Regions_Parser_Rules2[]
 
 * (*Seeking Modality*) this is the modality the parser starts off in:
@@ -386,11 +587,20 @@ is shown as a verbatim block and enable syntax highlighting (if supported).
    characters are a Region Begin Tag (`;>`):
 *** *No*? Ignore line and carry on with parsing parsing loop in Seeking mode.
 *** *Yes*?
-**** Process line and extract tag name and weight (if present)
-**** Create new data storage for this region and asign it its weight
-**** Add AsciiDoc line to stored region data with tagged region (e.g.
-     `// tag::tagId[]` where `tagId` will be either the extracted tag or an
-     autogenerated default fallback tag)
+**** Process line and extract _tag_, _weight_ and _subweight_ (if present):
+***** if no _tag_ was provided, use default fallback Id instead: `region`
+      followed by a counter that increases at each use (e.g. `region1`,
+      `region2`, etc.).
+***** if no _weight_ was provided: 
+****** if a region with same _tag_ already exists in memory, retrive its
+       weight and use it, otherwise assign the last used weigth incremented
+       by one (assume that the users wishes the new region to be continguos
+       with the preceding one).
+***** if no _subweight_ was provided: 
+****** if a region with same _tag_ already exists in memory, retrive its
+       last used subweight, increase by 1 and use it, otherwise use value 1.
+**** Create new entry in memory for this region fragment and store its weight
+     and subweight values.
 **** Enter _InsideRegion_ modality (Switch Loop).
 * (*InsideRegion Modality*):
 ** (_loop entrypoint_) Parse line and check if its first non-white space
@@ -416,14 +626,27 @@ is shown as a verbatim block and enable syntax highlighting (if supported).
 ***** If parser is in _InsideCode_ state, add to current region's stored data
       an AsciiDoc line containing a source delimiter to end source code
       block, followed by a blank line. Carry on parsing loop.
-***** Add AsciiDoc line to stored region data to end tagged region (e.g.
-     `// end::tagId[]` where `tagId` will be tag assigned to the current
-      current region).
 ***** Check if the Region End marker contais the `<` modifier (`;<<`);
       if not, add a blank line to current region, otherwise not.
 ***** Revert to _Seeking_ modality (Switch Loop).
-// end::Regions_Parser_Rules2[]
 
+[NOTE]
+===========================================================================
+During the parsing stage no AsciiDoc tagged region begin/end lines are added
+to the regions stored in memory, because regions with same tag still need
+to be sorted and merged together (the parser stores each region fragment
+separately, regardless of its tag).
+It will be the postprocessor's job to handle all that, and once fragmented
+regions are merged together the AsciiDoc `// tag:[]` and `// end:[]` lines
+will be added at their start and end, respectively.
+
+The AsciiDoc `// tag:[]` and `// end:[]` lines shown in the Live Preview
+are just for debugging purposes, so to speak, but they are not actually
+stored in memory at that point.
+===========================================================================
+
+
+// end::Regions_Parser_Rules2[]
 // tag::The_Parser_Final_Notes[]
 The above rules are going to be a useful reference when you've began learning
 Doxter, and by studying them you can get the full picture of its inner workings.
@@ -431,8 +654,8 @@ But the following guidelines and examples are a better starting point -- and
 don't forget to look at source code of Doxter, for it's self-documenting by
 its own system, and you can compare the source to the Asciidoc output and
 study it as an example.
-// end::The_Parser_Final_Notes[]
 
+// end::The_Parser_Final_Notes[]
 // tag::DocHeader[]
 
 === AsciiDoc Header
@@ -486,8 +709,8 @@ The Header parser doesn't consume those lines that didn't match its criteria,
 and as soon as it encounters a non Header line it rolls back the parser
 to the last file position, so that the regions parser can parse them instead.
 ========================
-// end::DocHeader[]
 
+// end::DocHeader[]
 // tag::Working_With_Regions[]
 
 === Working With Regions
@@ -495,16 +718,11 @@ to the last file position, so that the regions parser can parse them instead.
 The full syntax of a Tag Region Begin mark is:
 
 --------------------------
-;>tagname(<region weight>)
+;>tagname(<region weight>.<region subweight>)
 --------------------------
 
-… where `tagname` is a unique identifier for the tagged region, and
-`<region weight>` is an integer number. Both of them are optional, and if
-you don't supply them Doxter will, using the default Tag ID `region` followed
-by an incremental counter, and will assign as weight the value of the last
-encountered weight plus one.
-// end::Working_With_Regions[]
 
+// end::Working_With_Regions[]
 // tag::WIP[]
 == To Be Continued...
 
@@ -520,8 +738,8 @@ Also, by using it you can benefit from the
 <<Parsing Live Preview During Execution,live parsing preview log>>, which is
 an invaluable tool for learning.
 ============
-// end::WIP[]
 
+// end::WIP[]
 // tag::LICENSE[]
 == License
 
@@ -549,8 +767,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 =============================================================================
-// end::LICENSE[]
 
+// end::LICENSE[]
 // tag::TODOs[]
 == Roadmap
 
@@ -561,15 +779,33 @@ Here is a list of upcoming features, waiting to be implemented.
    Same-named regions will be stitched together into a single region, making
    their inclusion in other documents easier.
    Sub-weights will be used for sorting before merging the region. 
-// end::TODOs[]
 
+// end::TODOs[]
 // tag::CHANGELOG[]
 == Changelog
 
-* v0.1.2-alpha (2018/09/25) -- Aesthetic changes.
-* v0.1.1-alpha (2018/09/25) -- Created Doxter repository on GitHub.
-* v0.1.0-alpha (2018/09/21) -- First public released Alpha:
+* *v0.1.3-alpha* (2018/09/29) -- Doxter engine improved:
+** PureBasic special comments markers (`;{`, `;}` and `;-`) can now be used
+   in all Doxter markers, except ADoc Header (`;=`).
+** Regions merging feature introduced:
+*** Tagged regions with same tag identifier are merged into a single region
+     in the output document:
+**** All region fragments will be sorted by subweight before merging.
+*** Region subweight:
+**** New subweight parameter (optional) introduced in Region Begin marker,
+     (e.g. `;>tag(100.99`)` or `;>(.99)`, where subweight is `99`).
+**** If the marker doesn't provide a subweight, the last subweight value used
+     with that tag will be automatically employed after incrementing it by 1.
+*** When a weightless Region Begin marker is encountered, if a region with
+    the same tag already exists, that region's weight will be used for the
+    new region fragment, otherwise it will be given weight 1.
+*** If multiple weight definitions are given for a same region tag, the last
+    one encountered will override the previous ones.
+** Parsing Live Preview now shows subweight in new third column.
+* *v0.1.2-alpha* (2018/09/25) -- Aesthetic changes.
+* *v0.1.1-alpha* (2018/09/25) -- Created Doxter repository on GitHub.
+* *v0.1.0-alpha* (2018/09/21) -- First public released Alpha:
 https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb
-// end::CHANGELOG[]
 
+// end::CHANGELOG[]
 
