@@ -1,6 +1,6 @@
 # Doxter, the PureBasic Documentation Generator
 
-    doxter v0.1.3-alpha (2018/09/29) | PureBasic 5.62 | MIT License
+    doxter v0.1.4-alpha (2018/10/01) | PureBasic 5.62 | MIT License
 
 Welcome to Doxter, a Documentation from source generator written in PureBasic for PurBasic.
 
@@ -197,7 +197,7 @@ This repository also contains the third party components listed below, which ret
 
 - [`docs/hjs/`](./docs/hjs/)
 
-The above folder contains a custom release of [Highlight.js], with a modified version of the PureBasic syntax (original and modified versions by Tristano Ajmone).
+The above folder contains a custom release of [Highlight.js], with a modified version of the PureBasic syntax (original and modified versions by Tristano Ajmone) and some other languages.
 
 Highlight.js is Copyright (C) by Ivan Sagalaev [@isagalaev], 2006, and is released under the [BSD License][hljs license].
 

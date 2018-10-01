@@ -1,76 +1,75 @@
-/*
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   Highlight.js Themes for Doxter, by Tristano Ajmone
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Highlight.js base styles */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #000;
+  background: #F0F0F0; }
 
-PureBASIC native IDE style ( version 1.0 - April 2016 )
+/* HLJS PureBasic */
+code.hljs[data-lang=purebasic] {
+  color: #000000;
+  background: #FFFFDF;
+  border: 1px solid #bebab0; }
+  code.hljs[data-lang=purebasic] .hljs-type,
+  code.hljs[data-lang=purebasic] .hljs-function {
+    color: #000000; }
+  code.hljs[data-lang=purebasic] .hljs-comment {
+    color: #00AAAA; }
+  code.hljs[data-lang=purebasic] .hljs-title,
+  code.hljs[data-lang=purebasic] .hljs-function_call {
+    color: #006666; }
+  code.hljs[data-lang=purebasic] .hljs-keyword {
+    color: #006666;
+    font-weight: bold; }
+  code.hljs[data-lang=purebasic] .hljs-string {
+    color: #0080FF; }
+  code.hljs[data-lang=purebasic] .hljs-symbol {
+    color: #924B72; }
 
-by Tristano Ajmone <tajmone@gmail.com>
+/* HLJS AsciiDoc */
+code.hljs[data-lang=asciidoc] {
+  background: #2D2D2D;
+  color: #D3D0C8; }
+  code.hljs[data-lang=asciidoc] .hljs-comment {
+    color: #747369; }
+  code.hljs[data-lang=asciidoc] .hljs-title {
+    color: #FFCC66; }
+  code.hljs[data-lang=asciidoc] .hljs-section {
+    color: #F99157;
+    font-weight: bold; }
+  code.hljs[data-lang=asciidoc] .hljs-meta {
+    color: #6699CC; }
+  code.hljs[data-lang=asciidoc] .hljs-quote {
+    color: #CC99CC; }
+  code.hljs[data-lang=asciidoc] .hljs-code {
+    color: #99CC99; }
+  code.hljs[data-lang=asciidoc] .hljs-bullet {
+    color: #F2777A; }
+  code.hljs[data-lang=asciidoc] .hljs-symbol {
+    color: #F2777A; }
+  code.hljs[data-lang=asciidoc] .hljs-strong {
+    color: #E8E6DF;
+    font-weight: bold; }
+  code.hljs[data-lang=asciidoc] .hljs-emphasis {
+    color: #E8E6DF;
+    font-style: italic; }
+  code.hljs[data-lang=asciidoc] .hljs-string {
+    color: #6699CC; }
+  code.hljs[data-lang=asciidoc] .hljs-link {
+    color: #66CCCC; }
 
-Public Domain
+/* Shell */
+div.shell pre,
+.listingblock.shell > .content pre {
+  background: #000000;
+  color: #C0C0C0; }
+div.shell .conum,
+.listingblock.shell > .content .conum {
+  background: #FFF945 !important;
+  color: #000 !important; }
 
-	This CSS file diverge from the official one contained in highlight.js package.
-	This file as been optimized to highilight PureBASIC syntax ONLY!!
-	It also include the "function_call" class, to catch Procedure calls — as is customary
-	with PureBASIC IDE syntax coloring — which didn't make it into the official package.
-
-NOTE_1:	PureBASIC code syntax highlighting only applies the following classes:
-			.hljs-comment
-			.hljs-function
-			.hljs-keywords
-			.hljs-string
-			.hljs-symbol
-
-
-NOTE_2:	Color names provided in comments were derived using "Name that Color" online tool:
-			http://chir.ag/projects/name-that-color	
-*/
-
-.hljs { /* Common set of rules required by highlight.js (don'r remove!) */
-	display: block;
-	overflow-x: auto;
-	padding: 0.5em;
-	background: #FFFFDF; /* Half and Half (approx.) */
-/* --- Uncomment to add PureBASIC native IDE styled font!
-	font-family: Consolas;
-*/
-}
-
-.hljs, /* --- used for PureBASIC base color --- */
-.hljs-type,  /* --- used for PureBASIC Procedures return type --- */
-.hljs-function { /* --- used for wrapping PureBASIC Procedures definitions --- */
-	color: #000000; /* Black */
-}
-
-.hljs-comment { /* --- used for PureBASIC Comments --- */
-
-	color: #00AAAA; /* Persian Green (approx.) */
-}
-
-.hljs-title, .hljs-function_call { /* --- used for PureBASIC Procedures Names --- */
-	color: #006666; /* Blue Stone (approx.) */
-}
-
-.hljs-keyword { /* --- used for PureBASIC Keywords --- */
-	color: #006666; /* Blue Stone (approx.) */
-	font-weight: bold;
-}
-
-.hljs-string { /* --- used for PureBASIC Strings --- */
-	color: #0080FF; /* Azure Radiance (approx.) */
-}
-
-.hljs-symbol { /* --- used for PureBASIC Constants --- */
-	color: #924B72; /* Cannon Pink (approx.) */
-}
-
-/*	==============================================================================
-								  ASCIIDOC ADDITIONS
-	==============================================================================
-	Some extra CSS styling for AsciidocFX generated document.
-	(AsciiDoc via Asciidoctor) */
-
-/* --- Code-Block Border (common to all) --- */
-.hljs { border: 1px solid #bebab0; }
-
-/* --- PB PSEUDOCODE (Grey BG to distinghish it from normal PureBASIC code) --- */
-.pseudocode.hljs {
-	background: #F7F7F8; /* -------- */
-}
+/*# sourceMappingURL=github.min.css.map */

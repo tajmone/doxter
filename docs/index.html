@@ -437,8 +437,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Doxter: Docs-Generator from PB Sources.</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">version 0.1.3-alpha,</span>
-<span id="revdate">September 29, 2018</span>
+<span id="revnumber">version 0.1.4-alpha,</span>
+<span id="revdate">October 1, 2018</span>
 <br><span id="revremark">Public Alpha</span>
 </div>
 <div id="toc" class="toc2">
@@ -588,10 +588,10 @@ Doxter region:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>// tag::region1[]
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">// tag::region1[]
 I'm a Doxter _region_.
 
-// end::region1[]</pre>
+// end::region1[]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -609,12 +609,12 @@ I'm a Doxter _region_.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>// tag::intro[]
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">// tag::intro[]
 == Introduction
 
 This a _named_ region.
 
-// end::intro[]</pre>
+// end::intro[]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -655,7 +655,7 @@ Next
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>// tag::premise[]
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">// tag::premise[]
 == Premise
 
 This is an opening premise.
@@ -666,7 +666,7 @@ This is an opening premise.
 
 And this is Sec 1.
 
-// end::sec1[]</pre>
+// end::sec1[]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -723,7 +723,7 @@ after being sorted according to ther subeweights (<code>.1</code>, <code>.2</cod
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>// tag::even_macro_intro[]
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">// tag::even_macro_intro[]
 === The IsEven Macro
 
 Using bitwise operations insted of modulo (`%`) is much _much_ faster -- in
@@ -758,7 +758,7 @@ Next
 --------------------------------------------------------------------------------
 
 
-// end::macro_test[]</pre>
+// end::macro_test[]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -803,7 +803,7 @@ Next
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>// tag::macro_test[]
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">// tag::macro_test[]
 Let's test that the macro actually works as expected.
 
 [source,purebasic]
@@ -818,7 +818,7 @@ Next
 --------------------------------------------------------------------------------
 
 
-// end::macro_test[]</pre>
+// end::macro_test[]</code></pre>
 </div>
 </div>
 </div>
@@ -918,7 +918,7 @@ friendly insight into Doxter&#8217;s parser.</p>
 <div class="paragraph">
 <p>Here&#8217;s an example of how the console output looks like:</p>
 </div>
-<div class="listingblock">
+<div class="listingblock shell">
 <div class="content">
 <pre>|0099|4100|   1|region tag, which would split the text in multiple paragraphs in the final <i class="conum" data-value="1"></i><b>(1)</b>
 |0100|4100|   1|document.
@@ -1398,7 +1398,7 @@ Here&#8217;s an example from the very source of Doxter:</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-purebasic hljs" data-lang="purebasic">;= Doxter: Docs-Generator from PB Sources.
 ;| Tristano Ajmone, &lt;tajmone@gmail.com&gt;
-;| v0.1.3-alpha, September 29, 2018: Public Alpha
+;| v0.1.4-alpha, October 1, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
@@ -1575,6 +1575,16 @@ Sub-weights will be used for sorting before merging the region.</p>
 <div class="ulist">
 <ul>
 <li>
+<p><strong>v0.1.4-alpha</strong> (2018/10/01)&#8201;&#8212;&#8201;Documentation:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>AsciiDoc examples now syntax highlighted.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><strong>v0.1.3-alpha</strong> (2018/09/29)&#8201;&#8212;&#8201;Doxter engine improved:</p>
 <div class="ulist">
 <ul>
@@ -1647,8 +1657,8 @@ one encountered will override the previous ones.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1.3-alpha<br>
-Last updated 2018-09-29 00:15:06 ora legale Europa occidentale
+Version 0.1.4-alpha<br>
+Last updated 2018-10-01 20:46:24 ora legale Europa occidentale
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">

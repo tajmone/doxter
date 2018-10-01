@@ -1,11 +1,11 @@
 ﻿;= Doxter: Docs-Generator from PB Sources.
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.1.3-alpha, September 29, 2018: Public Alpha
+;| v0.1.4-alpha, October 1, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.1.3-alpha"
+#DOXTER_VER$ = "0.1.4-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
@@ -950,7 +950,7 @@ Procedure.s LinePreview(text.s, LineNum = 0, weight = 0, subweight = 0)
 
   ;| Here's an example of how the console output looks like:
 
-  ;|
+  ;| [role="shell"]
   ;| ----------------------------------------------------------
   ;||0099|4100|   1|region tag, which would split the text in multiple paragraphs in the final <1>
   ;||0100|4100|   1|document.
@@ -1110,6 +1110,7 @@ EndProcedure
 
 ;| \... which, in the final document, Doxter will render as AsciiDoc:
 
+;| [source,asciidoc]
 ;| -----------------------------------------------------------------------------
 ;| // tag::region1[]
 ;| I'm a Doxter _region_.
@@ -1130,6 +1131,7 @@ EndProcedure
 ;| ;<
 ;| -----------------------------------------------------------------------------
 
+;| [source,asciidoc]
 ;| -----------------------------------------------------------------------------
 ;| // tag::intro[]
 ;| == Introduction
@@ -1172,6 +1174,7 @@ EndProcedure
 ;| ;<
 ;| -----------------------------------------------------------------------------
 
+;| [source,asciidoc]
 ;| -----------------------------------------------------------------------------
 ;| // tag::premise[]
 ;| == Premise
@@ -1237,6 +1240,7 @@ EndProcedure
 ;| \... all the regions named `even_macro_intro` are merged into a single region
 ;| after being sorted according to ther subeweights (`.1`, `.2` and `.3`):
 
+;| [source,asciidoc]
 ;| -----------------------------------------------------------------------------
 ;| // tag::even_macro_intro[]
 ;| === The IsEven Macro
@@ -1313,6 +1317,7 @@ EndProcedure
 ;| -----------------------------------------------------------------------------
 
 
+;| [source,asciidoc]
 ;| -----------------------------------------------------------------------------
 ;| // tag::macro_test[]
 ;| Let's test that the macro actually works as expected.
@@ -1562,6 +1567,8 @@ EndProcedure
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
+;| * *v0.1.4-alpha* (2018/10/01) -- Documentation:
+;| ** AsciiDoc examples now syntax highlighted.
 ;| * *v0.1.3-alpha* (2018/09/29) -- Doxter engine improved:
 ;| ** PureBasic special comments markers (`;{`, `;}` and `;-`) can now be used
 ;|    in all Doxter markers, except ADoc Header (`;=`).

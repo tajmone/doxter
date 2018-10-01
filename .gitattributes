@@ -54,7 +54,7 @@
 *.htm      text
 *.html     text
 *.css      text
-*.js       text
+*.js       text eol=lf
 
 ## ============
 ## PANDOC FILES
