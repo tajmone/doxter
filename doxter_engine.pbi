@@ -1,6 +1,6 @@
 ﻿;= Doxter Engine
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.0.1-alpha, October 3, 2018: Public Alpha
+;| v0.0.2-alpha, October 10, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
@@ -32,14 +32,15 @@ DeclareModule dox
   ; ============================================================================
   ;- PUBLIC PROCEDURES DECLARATION
   ; ============================================================================
+  Declare    SetEngineLang(lang.s = "purebasic")
   Declare    ParseFile(SrcFileName.s)
   Declare    SaveDocFile(OutFileName.s)
   Declare    Abort(ErrMsg.s)
   
-  Declare Init()
   ; ============================================================================
   ;- PUBLIC DATA
   ; ============================================================================
+  ; TODO: Make Regions data private, expose only stats.
   Structure RegionData
     Weight.i
     Subweight.i
@@ -51,10 +52,14 @@ DeclareModule dox
   NewList HeaderL.s()
   
 EndDeclareModule
-
+;}******************************************************************************
+; *                                                                            *
+;-                          MODULE'S PRIVATE INTERFACE
+; *                                                                            *
+;{******************************************************************************
 Module dox
   ; ============================================================================
-  ;-                       PRIVATE PROCEDURES DECLARATION
+  ;- PRIVATE PROCEDURES DECLARATION
   ; ============================================================================
   Declare    IsAdocComment(codeline.s)
   Declare    IsSkipComment(codeline.s)
@@ -63,26 +68,22 @@ Module dox
   Declare    ADocSourceEnd(weight = 0)
   Declare.s  LinePreview(text.s, LineNum = 0, weight = 0, subweight = 0)
   Declare.s  HeaderLinePreview(text.s, LineNum = 0)
-  ; ******************************************************************************
-  ; *                                                                            *
-  ;-                                    SETUP
-  ; *                                                                            *
-  ; ******************************************************************************
   ; ==============================================================================
-  ;                                    Settings
+  ;- Misc Internal Settings
   ; ==============================================================================
-  #SourceDelimiterLen = 80 ; ADoc Source Block delimiters lenght (chars).
-  
-  #FallbackTag = "region" ; Fallback Tag Id to use when none is provided.
-  
-  #LineNumDigits = 4 ; Used in Debug output: digits-width of line numbers.
-  #WeightsDigits = 4 ; Used in Debug output: digits-width of regions' weights.
+  #SourceDelimiterLen = 80   ; ADoc Source Block delimiters lenght (chars).
+  #FallbackTag = "region"    ; Fallback Tag Id to use when none is provided.
+  #LineNumDigits = 4         ; Used in Debug output: digits-width of line numbers.
+  #WeightsDigits = 4         ; Used in Debug output: digits-width of regions' weights.
   
   ; ==============================================================================
-  ;                            Procedures Declarations
+  ;-                       ENGINE SETTINGS & INITIALIZATION                       
   ; ==============================================================================
+  sourcelang.s = "purebasic" ; Language for generated ADoc source code block
+  headerMarker.s = ";="      ; ADoc Header Marker
+  
   ; ==============================================================================
-  ;                                   Internals
+  ; Doxter Markers
   ;{==============================================================================
   ;{>Comments_Marks(3000)
   ;| 
@@ -103,12 +104,18 @@ Module dox
   ;| ¦ ;< ¦ Region End   ¦ Marks end of a tagged region.
   ;| |============================================================================
   ;|
+  ;| SpiderBasic uses the same comments delimiter as PureBasic. As for Alan,
+  ;| just use its native comment delimiter (`--`) instead of `;` -- i.e. `-->`,
+  ;| `--|`, `--~`, etc. The same applies to any other languages that will be 
+  ;| supported in the future.
+  ;| 
   ;| [NOTE]
   ;| =============================================================================
-  ;| You can freely use PureBasic's special comments marks (`;{`/`;}`/`;-`) within
-  ;| Doxter's markers (e.g. `;{>`, `;}~`, `;-|`, etc.) execpt in the ADoc Header
-  ;| marker, which must be `;=`.
-  ;| This allows you to create regions which are foldable in PureBasic IDE.
+  ;| In PureBasic and SpiderBasic you can freely use the special comments marks
+  ;| (`;{`/`;}`/`;-`) within Doxter's markers (e.g. `;{>`, `;}~`, `;-|`, etc.)
+  ;| execpt in the ADoc Header marker, which can only be `;=`.
+  ;| This allows you to create regions which are foldable in PureBasic's and
+  ;| SpiderBasic's native IDEs.
   ;| =============================================================================
   ;|
   ;| The *Tagged Region End* marker has an alternative syntax to prevent Doxter
@@ -127,57 +134,99 @@ Module dox
   ;| document.
   ;}<
   
-  #PB_CommDelim = ";[{}\-]?"
+  #PB_CommDelim = ";[{}\-]?" ; either:   ;   ;{   ;}   ;-
   
-  #mrk_RegionStart = #PB_CommDelim + ">"
-  #mrk_RegionEnd   = #PB_CommDelim + "<"
-  #mrk_ADocLine    = #PB_CommDelim + "\|"
-  #mrk_SkipLine    = #PB_CommDelim + "~"
-  
-  
+  #mrk_RegionStart = ">"
+  #mrk_RegionEnd   = "<"
+  #mrk_ADocLine    = "\|"
+  #mrk_SkipLine    = "~"
+ 
   ;}==============================================================================
-  ;-                                    RegExs
+  ;- Doxter Markers RegExs
   ;{==============================================================================
+  ; We use named enumerator to carry on RegExs IDs constants values and prevent
+  ; same IDs errors if other enumerated RegExs are created elsewhere (RegExs IDs
+  ; are truely global and not subject to Modules name spacing). 
+  Enumeration RegExsIDs
+    ; Empty enum needed to get RegExsIDs's #PB_Compiler_EnumerationValue
+  EndEnumeration
+  #RE_MarksFirst = #PB_Compiler_EnumerationValue
+  
   Enumeration RegExsIDs
     #RE_TagRegionBegin
     #RE_TagRegionEnd
     #RE_ADocComment
     #RE_SkipComment
   EndEnumeration
-  #totRegExs  = #PB_Compiler_EnumerationValue -1
+  #RE_MarksLast = #PB_Compiler_EnumerationValue -1
+  #RE_MarksTot  = #PB_Compiler_EnumerationValue - #RE_MarksFirst
   
-  Restore REGEX_PATTERNS
-  For i=0 To #totRegExs
-    Read.s RE_Pattern$
-    If Not CreateRegularExpression(i, RE_Pattern$)
-      Debug "ERROR: Couldn't create RegEx #" + Str(i)
-      End 1
-    EndIf
-  Next
-  
-  DataSection
+    DataSection
+    ; Here we store the only end part of the RegExs
     REGEX_PATTERNS:
-    Data.s "^\s*?" + #mrk_RegionStart +     ; #RE_TagRegionBegin -- Named groups:
-           "(?<tag>\w*)"+                   ;   <tag>                   (optional)
-           "(\("+                           ;
-           "(?<weight>\d*)?"+               ;   <weight>                (optional)
-           "(\.(?<subweight>\d+))?"+        ;   <subweight>             (optional)
-           "\))?"
-    Data.s "^\s*?" + #mrk_RegionEnd +       ; #RE_TagRegionEnd -- Named groups:
-           "(?<modifier>[<]?)"              ;   <modifier>              (optional)
-    Data.s "^\s*"+ #mrk_ADocLine +" ?(.*)$" ; #RE_ADocComment
-    Data.s "^\s*"+ #mrk_SkipLine            ; #RE_SkipComment
+    Data.s #mrk_RegionStart +         ; #RE_TagRegionBegin -- Named groups:
+           "(?<tag>\w*)"+             ;   <tag>                   (optional)
+           "(\("+                     ;
+           "(?<weight>\d*)?"+         ;   <weight>                (optional)
+           "(\.(?<subweight>\d+))?"+  ;   <subweight>             (optional)
+           "\))?"                     ;
+    Data.s #mrk_RegionEnd +           ; #RE_TagRegionEnd -- Named groups:
+           "(?<modifier>[<]?)"        ;   <modifier>              (optional)
+    Data.s #mrk_ADocLine +" ?(.*)$"   ; #RE_ADocComment
+    Data.s #mrk_SkipLine              ; #RE_SkipComment
   EndDataSection
+  
+  SetEngineLang() ; FIXME: Call SetEngineLang()
+  ;}==============================================================================
+  ;- SetEngineLang()
+  ;{==============================================================================
+  ; This procedure initializes the engine according to passed lang and comment
+  ; delimiter parameters:
+  ; - [x] Creates all the required Markers RegExs.
+  ; - [ ] Set the default language to use in ADoc source blocks.
+  ; Currently designed to be invoked just once (not ready to handle multiple parsings
+  ; with different settings).
+  ; NOTE: SetEngineLang() can recreate the RegExs, the old ones will be replaced by
+  ;       the new ones; it's not necessary to free the old ones first!
+  ; ------------------------------------------------------------------------------
+  Procedure SetEngineLang(lang.s = "purebasic")
+    Shared sourcelang, headerMarker
+    
+    commDel.s = #PB_CommDelim
+    
+    Select LCase(lang)
+      Case "spiderbasic"
+        ; TODO: Set lang to SpiderBasic
+        sourcelang = "spiderbasic"
+        headerMarker = ";="
+      Case "alan"
+        ; TODO: Set lang to SpiderBasic
+        sourcelang = "alan"
+        commDel = "--"
+        headerMarker = "--="
+      Default
+        ; PureBasic settings fallback
+        sourcelang = "purebasic"
+        headerMarker = ";="
+    EndSelect
+    
+    Restore REGEX_PATTERNS
+    For i=#RE_MarksFirst To #RE_MarksLast
+      Read.s RE_Pattern$
+      If Not CreateRegularExpression(i, "^\s*" + commDel + RE_Pattern$)
+        Debug "ERROR: Couldn't create RegEx #" + Str(i)
+        End 1
+      EndIf
+    Next
+  EndProcedure
   ;}
+
   
   ; ****************************************************************************
   ; *                                                                          *
   ;-                             PUBLIC PROCEDURES
   ; *                                                                          *
   ; ****************************************************************************
-  Procedure Init()
-  EndProcedure
-  ; ------------------------------------------------------------------------------
   Procedure ParseFile(SrcFileName.s)
 ;     PrintN(">>> dox::ParseFile("+SrcFileName+")") ; DELME Proc Enter Debug
     ;{>two_steps_parsing(4010)
@@ -193,6 +242,7 @@ Module dox
     ;| These are two different parsers altogether, and Doxter always runs the fed
     ;| source file against both of them, in the exact order specified above.
     ;}<---------------------------------------------------------------------------
+    Shared sourcelang, headerMarker
     Shared RegionsL()
     Shared HeaderL()
     
@@ -298,13 +348,13 @@ Module dox
     ; If the first line starts with ";=" then it's an AsciiDoc Header
     FilePos = Loc(fileH) ; Store current position in case we need to rollback
     firstline.s = ReadString(fileH)
-    If Left(firstline, 2) = ";="
+    If Left(firstline, Len(headerMarker)) = headerMarker
       ; ============
       ; Header found
       ; ============
       ; LineNum$ = RSet(Str(cntLine), #LineNumDigits, "0") + "|"
       AddElement(HeaderL())
-      HeaderL() = Right(firstline, Len(firstline)-1)
+      HeaderL() = Right(firstline, Len(firstline)-Len(headerMarker)+1)
       HeaderLinePreview(HeaderL(), cntLine)
       cntLine +1
       ; Now every following ADoc Comment Line we'll be treatd as part of the Header,
@@ -782,6 +832,8 @@ Module dox
   ;-                             PRIVATE PROCEDURES
   ; *                                                                          *
   ; ****************************************************************************
+
+  ; ------------------------------------------------------------------------------
   Procedure IsAdocComment(codeline.s)
     
     If MatchRegularExpression(#RE_ADocComment, codeline)
@@ -808,7 +860,7 @@ Module dox
   EndProcedure
   ; ------------------------------------------------------------------------------
   Procedure ADocSourceStart(weight = 0)
-    
+    Shared sourcelang
     Shared RegionsL()
     
     With RegionsL()
@@ -818,7 +870,7 @@ Module dox
       LinePreview(\StringsL(), 0, weight)
       
       AddElement(\StringsL())
-      \StringsL() = "[source,purebasic]"
+      \StringsL() = "[source,"+ sourcelang +"]"
       LinePreview(\StringsL(), 0, weight)
       
       AddElement(\StringsL())
@@ -1085,7 +1137,12 @@ EndModule
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
-;| * *v0.0.1-alpha* (2018/10/xx) -- First module engine release.
+;| * *v0.0.2-alpha* (2018/10/10) -- Add support for Alan language, and improve
+;|   SpiderBasic support:
+;| ** The Engine now exposes a `dox::SetEngineLang(lang.s)` procedure to allow
+;|    setting the comment delimiter and the language of source blocks according
+;|    to the selected language (`"PureBasic"`, `"SpiderBasic"` or `"Alan"`). 
+;| * *v0.0.1-alpha* (2018/10/03) -- First module engine release.
 ;}<
 
 

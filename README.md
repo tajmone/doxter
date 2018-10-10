@@ -1,8 +1,8 @@
-# Doxter, the PureBasic Documentation Generator
+# Doxter, A PureBasic Documentation Generator
 
-    doxter v0.1.4-alpha (2018/10/01) | PureBasic 5.62 | MIT License
+    doxter v0.2.1-alpha (2018/10/10) | PureBasic 5.62 | MIT License
 
-Welcome to Doxter, a Documentation from source generator written in PureBasic for PurBasic.
+Welcome to Doxter, a Documentation from source generator written in PureBasic for [PureBasic], [SpiderBasic] and [Alan IF] (more languages coming soon).
 
 - https://github.com/tajmone/doxter
 
@@ -31,13 +31,13 @@ For the documentation, see:
 
 # About Doxter
 
-Doxter is a cross platform, fully standalone command line binary tool to generate AsciiDoc documentation from PureBasic or SpiderBasic source files.
+Doxter is a cross platform, fully standalone command line binary tool to generate AsciiDoc documentation from PureBasic, SpiderBasic or Alan source files.
 
-Invoke Doxter by passing a PureBasic source file:
+Invoke Doxter by passing a source file of a supported language:
 
     > doxter myfile.pb
 
-and it will create an AsciiDoc document from it, named `myfile.asciidoc` (or `myfile.ascidoc`).
+... Doxter will autodetect the language from its file extension, and it will create an AsciiDoc document from it, named `myfile.asciidoc` (or `myfile.ascidoc`).
 
 It works its magic by a special notation in comments delimiters to markup tagged regions of text and code that should be extracted and exported to the AsciiDoc document.
 
@@ -225,12 +225,12 @@ For more details see [`docs/hjs/README.md`](./docs/hjs/README.md).
 [Highlight.js]: https://highlightjs.org
 [@isagalaev]: https://github.com/isagalaev
 
-
-<!-- Temporarily broken link:
 [Cod]: http://lou.wtf/cod/ "Visit Cod's website"
--->
-[Cod]: https://github.com/namuol/cod "Visit Cod's repository on GitHub"
 [Lou Acresti]: http://lou.wtf/ "Visit Lou Acresti's website"
 [@namuol]: https://github.com/namuol "Visit Lou Acresti's GitHub profile"
+
+[PureBasic]: https://www.purebasic.com/ "Visit PureBasic's website"
+[SpiderBasic]: https://www.spiderbasic.com/ "Visit SpiderBasic's website"
+[Alan IF]: https://www.alanif.se/ "Visit Alan's website"
 
 <!-- EOF -->

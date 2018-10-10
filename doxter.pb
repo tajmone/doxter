@@ -1,11 +1,11 @@
-﻿;= Doxter: Docs-Generator from PB Sources.
+﻿;= Doxter: A Docs from Sources Generator.
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.2.0-alpha, October 3, 2018: Public Alpha
+;| v0.2.1-alpha, October 10, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.2.0-alpha"
+#DOXTER_VER$ = "0.2.1-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
@@ -17,10 +17,11 @@
 ;| =============================================================================
 ;| image::doxter_logo.svg[Doxter Logo,align="center"]
 ;|
-;| Doxter is a tool to generate AsciiDoc documentation from PureBasic source
+;| Doxter is a binary tool to generate AsciiDoc documentation from  source
 ;| files, by using a special notations in comments delimiters to markup tagged
 ;| regions of text and code that will be exported to an AsciiDoc source document
 ;| where the various regions will be sorted according to their tag's weight.
+;| It currently supports PureBasic, SpiderBasic and Alan IF source files.
 ;| Released under <<License,MIT License>>.
 ;| 
 ;| https://github.com/tajmone/doxter
@@ -60,7 +61,8 @@ SrcFile.s = ProgramParameter()
 ;| doxter <sourcefile>
 ;|--------------------
 ;|
-;| … where `<sourcefile>` is a PureBasic or SpiderBasic source file.
+;| … where `<sourcefile>` is a source of one of the languages supported by Doxter
+;| (PureBasic, SpiderBasic or Alan).
 ;}<-----------------------------------------------------------------------------
 
 If SrcFile = #Empty$
@@ -73,26 +75,36 @@ EndIf
 ;{>Input_File_Validation(3300)--------------------------------------------------
 ;| === Input File Validation
 ;|
-;| Doxter checks that the passed `<sourcefile>` parameter has a valid extension:
+;| Doxter checks that the passed `<sourcefile>` parameter has a valid extension,
+;| and then sets the Doxter Engine language accordingly:
 ;|
-;| * `.pb`  -- PureBasic source file.
-;| * `.pbi` -- PureBasic include file.
-;| * `.pbf` -- PureBasic form file.
-;| * `.sb`  -- SpiderBasic source file.
+;| [horizontal]
+;| `pb`, `pbi`, `pbf` :: -> PureBasic
+;| `sb`, `sbi`, `sbf` :: -> SpiderBasic
+;| `alan`, `i`        :: -> Alan
 ;|
-;| If the file extension doesn't match, Doxter will report an error and abort
-;| with Status Error 1.
+;| If the file extension doesn't match any of the supported extensions, Doxter
+;| will report an error and abort with Status Error 1.
 ;}<-----------------------------------------------------------------------------
 SrcExt.s = GetExtensionPart(SrcFile)
 
 Select LCase(SrcExt)
-  Case "pb", "pbi", "pbf", "sb"
-    ValidExt = #True
+  Case "pb", "pbi", "pbf"
+    ; dox::SetEngineLang("PureBasic")
+    currLang.s = "PureBasic"
+  Case "sb", "sbi", "sbf"
+    ; dox::SetEngineLang("SpiderBasic")
+    currLang.s = "SpiderBasic"
+  Case "alan", "i"
+    ; dox::SetEngineLang("Alan")
+    currLang.s = "Alan"
+  Default
+    dox::Abort(~"Invalid file extension \"."+ SrcExt +~"\".\nCurrently only PureBasic, SpiderBasic and Alan source files are supported.")
 EndSelect
 
-If Not ValidExt
-  dox::Abort(~"Invalid file extension \"."+ SrcExt +~"\". Only PB and SB files accepted.")
-EndIf
+PrintN("Source language detected: "+ currLang)
+dox::SetEngineLang(currLang)
+
 ;{>Input_File_Validation -------------------------------------------------------
 ;| Doxter will also check that the file exists, it's not a directory, and it's
 ;| not 0 Kb in size; and abort with Status Error if any of these are met.
@@ -200,8 +212,11 @@ End 0
 ;| of them are not language agnostic, don't integrate well with PureBasic, or
 ;| require a complex setup envolving lot's of dependencies.
 
-;| Doxter was designed to work with PureBasic, leveraging the power of AsciiDoc
-;| and with simplicity in mind.
+;| Doxter was originally designed to work with PureBasic, leveraging the power
+;| of AsciiDoc and with simplicity in mind. It now supports SpiderBasic and Alan
+;| IF sources too and, ultimately, it will be become a language agnostic tool
+;| usable with almost any language.
+
 ;<
 
 ;>who_needs(1100)
@@ -211,8 +226,8 @@ End 0
 ;| Any PureBasic or SpiderBasic programmer who knows AsciiDoc and wants to include
 ;| documentation of his/her code directly in the source files can benefit from
 ;| Doxter by automating the task of producing always up-to-date documentation
-;| in various formats (HTML5, man pages, PDF, and any other format supported by
-;| AsciDoc conversion backends).
+;| in various formats (HTML5, man pages, PDF, and any other output format supported
+;| by Asciidoctor's backends).
 ;<
 
 ;>doxter_engine(1200)
@@ -248,11 +263,10 @@ End 0
 ;>Features(2000)
 ;| == Features
 
-;| Doxter is a command line tool that parses a PureBasic (or SpiderBasic) source
-;| file and extracts from it tag-delimited regions of code, these regions are
-;| then processed according to some very simple rules in order to produce a well
-;| formed AsciiDoc source document which can then be converted to HTML via
-;| Asciidoctor (Ruby).
+;| Doxter is a command line tool that parses a source file and extracts from it
+;| tag-delimited regions of code, these regions are then processed according to
+;| some very simple rules in order to produce a well formed AsciiDoc source
+;| document which can then be converted to HTML via Asciidoctor (Ruby).
 
 ;| === Cross Documents Selective Inclusions
 ;|
@@ -313,7 +327,7 @@ End 0
 
 ;| === _Ordo ab Chao_: Structured Docs from Scattered Comments
 ;|
-;| Each tagged region in the PB source can be assigned a weight, so that in the
+;| Each tagged region in the source file can be assigned a weight, so that in the
 ;| final document the regions will be reordered in a specific way, forming a well
 ;| structured document that presents contents in the right order.
 
@@ -449,18 +463,22 @@ End 0
 
 ;| === Mix Text and Source Code in Your Documentation
 ;|
-;| Regions can be made up of AsciiDoc comments and source code, allowing to include
-;| fragments of the original source code in the final documentation, along with
-;| AsciiDoc text.
+
+;| Regions can contain both of AsciiDoc comments markers and source code, allowing
+;| to include fragments of the original source code in the final documentation,
+;| along with AsciiDoc text.
+
 ;|
-;| AsciiDoc comments are comment lines with special comments delimiters which
-;| will be treated as normal comments by PureBasic, but Doxter will strip them of
-;| the comment delimiter so that they will become AsciiDoc lines in the output
-;| document.
+
+;| AsciiDoc markers are comment lines with special symbols after the native
+;| language's comment delimiters, which will be treated as normal comments by the
+;| source language, but which Doxter will strip of the comment delimiter and turn
+;| into AsciiDoc lines in the output document.
+
 ;|
 ;| Any source code (i.e. non-AsciiDoc comments) inside a tagged region will be
-;| rendered in the final document inside an AsciiDoc source block, with PureBasic
-;| set as its language.
+;| rendered in the final document as an AsciiDoc source code block set to the
+;| source's language (e.g. PureBasic).
 
 ;| [source,purebasic]
 ;| -----------------------------------------------------------------------------
@@ -711,12 +729,12 @@ End 0
 ;| Doxter it's still a young application, and there is always room for improvements.
 ;| Here is a list of upcoming features, waiting to be implemented.
 
-;| * *Support Other Languages*.
+;| * *Support More Languages*.
 ;~ 
-;|    Doxter will be usable with languages other than PureBasic by providing a
-;|    set of natively supported languages and by allowing to specify via command
-;|    line options a custom comment delimiter and the default language name to
-;|    be used in AsciiDoc source code blocks.
+;|    The ultimate goal is to make Doxter a language agnostic tool, usable with
+;|    any language, by extending the set of natively supported languages and by
+;|    allowing to specify via command line options a custom comment delimiter and
+;|    set the default language name to be used in AsciiDoc source code blocks.
 
 ;| * *Configuration Files*.
 ;~ 
@@ -743,6 +761,14 @@ End 0
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
+;| * *v0.2.1-alpha* (2018/10/10) -- Add Alan IF support.
+;| ** Now Doxter will detect from the input file's extension whether it's a
+;|    PureBasic, SpiderBasic or Alan IF source file, and set the comment delimiter
+;|    and base language (to use in ADoc source blocks) accordingly.
+;| ** The supported extensions, and associated languages now are:
+;| *** `pb`, `pbi`, `pbf` -> PureBasic
+;| *** `sb`, `sbi`, `sbf` -> SpiderBasic
+;| *** `alan`, `i`        -> Alan
 ;| * *v0.2.0-alpha* (2018/10/03) -- Move Doxter Engine to separate module:
 ;| ** Now the core engine of Doxter is in a separate module, so that it will be
 ;|    usable by other applications too (still needs some fixes to be usable in

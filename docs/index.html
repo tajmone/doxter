@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.7.1">
 <meta name="author" content="Tristano Ajmone, &lt;tajmone@gmail.com&gt;">
-<title>Doxter: Docs-Generator from PB Sources.</title>
+<title>Doxter: A Docs from Sources Generator.</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -434,11 +434,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Doxter: Docs-Generator from PB Sources.</h1>
+<h1>Doxter: A Docs from Sources Generator.</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">version 0.2.0-alpha,</span>
-<span id="revdate">October 3, 2018</span>
+<span id="revnumber">version 0.2.1-alpha,</span>
+<span id="revdate">October 10, 2018</span>
 <br><span id="revremark">Public Alpha</span>
 </div>
 <div id="toc" class="toc2">
@@ -491,10 +491,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="paragraph">
-<p>Doxter is a tool to generate AsciiDoc documentation from PureBasic source
+<p>Doxter is a binary tool to generate AsciiDoc documentation from  source
 files, by using a special notations in comments delimiters to markup tagged
 regions of text and code that will be exported to an AsciiDoc source document
 where the various regions will be sorted according to their tag&#8217;s weight.
+It currently supports PureBasic, SpiderBasic and Alan IF source files.
 Released under <a href="#_license">MIT License</a>.</p>
 </div>
 <div class="paragraph">
@@ -528,8 +529,10 @@ of them are not language agnostic, don&#8217;t integrate well with PureBasic, or
 require a complex setup envolving lot&#8217;s of dependencies.</p>
 </div>
 <div class="paragraph">
-<p>Doxter was designed to work with PureBasic, leveraging the power of AsciiDoc
-and with simplicity in mind.</p>
+<p>Doxter was originally designed to work with PureBasic, leveraging the power
+of AsciiDoc and with simplicity in mind. It now supports SpiderBasic and Alan
+IF sources too and, ultimately, it will be become a language agnostic tool
+usable with almost any language.</p>
 </div>
 <div class="sect2">
 <h3 id="_who_needs_doxter">Who Needs Doxter?</h3>
@@ -537,8 +540,8 @@ and with simplicity in mind.</p>
 <p>Any PureBasic or SpiderBasic programmer who knows AsciiDoc and wants to include
 documentation of his/her code directly in the source files can benefit from
 Doxter by automating the task of producing always up-to-date documentation
-in various formats (HTML5, man pages, PDF, and any other format supported by
-AsciDoc conversion backends).</p>
+in various formats (HTML5, man pages, PDF, and any other output format supported
+by Asciidoctor&#8217;s backends).</p>
 </div>
 </div>
 <div class="sect2">
@@ -570,11 +573,10 @@ for having created such an inspiring tool like Cod.</p>
 <h2 id="_features">Features</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Doxter is a command line tool that parses a PureBasic (or SpiderBasic) source
-file and extracts from it tag-delimited regions of code, these regions are
-then processed according to some very simple rules in order to produce a well
-formed AsciiDoc source document which can then be converted to HTML via
-Asciidoctor (Ruby).</p>
+<p>Doxter is a command line tool that parses a source file and extracts from it
+tag-delimited regions of code, these regions are then processed according to
+some very simple rules in order to produce a well formed AsciiDoc source
+document which can then be converted to HTML via Asciidoctor (Ruby).</p>
 </div>
 <div class="sect2">
 <h3 id="_cross_documents_selective_inclusions">Cross Documents Selective Inclusions</h3>
@@ -639,7 +641,7 @@ parts from the modules' docs in a self-updating fashion.</p>
 <div class="sect2">
 <h3 id="_ordo_ab_chao_structured_docs_from_scattered_comments"><em>Ordo ab Chao</em>: Structured Docs from Scattered Comments</h3>
 <div class="paragraph">
-<p>Each tagged region in the PB source can be assigned a weight, so that in the
+<p>Each tagged region in the source file can be assigned a weight, so that in the
 final document the regions will be reordered in a specific way, forming a well
 structured document that presents contents in the right order.</p>
 </div>
@@ -779,20 +781,20 @@ document.</p>
 <div class="sect2">
 <h3 id="_mix_text_and_source_code_in_your_documentation">Mix Text and Source Code in Your Documentation</h3>
 <div class="paragraph">
-<p>Regions can be made up of AsciiDoc comments and source code, allowing to include
-fragments of the original source code in the final documentation, along with
-AsciiDoc text.</p>
+<p>Regions can contain both of AsciiDoc comments markers and source code, allowing
+to include fragments of the original source code in the final documentation,
+along with AsciiDoc text.</p>
 </div>
 <div class="paragraph">
-<p>AsciiDoc comments are comment lines with special comments delimiters which
-will be treated as normal comments by PureBasic, but Doxter will strip them of
-the comment delimiter so that they will become AsciiDoc lines in the output
-document.</p>
+<p>AsciiDoc markers are comment lines with special symbols after the native
+language&#8217;s comment delimiters, which will be treated as normal comments by the
+source language, but which Doxter will strip of the comment delimiter and turn
+into AsciiDoc lines in the output document.</p>
 </div>
 <div class="paragraph">
 <p>Any source code (i.e. non-AsciiDoc comments) inside a tagged region will be
-rendered in the final document inside an AsciiDoc source block, with PureBasic
-set as its language.</p>
+rendered in the final document as an AsciiDoc source code block set to the
+source&#8217;s language (e.g. PureBasic).</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -840,7 +842,8 @@ Next
 </div>
 </div>
 <div class="paragraph">
-<p>… where <code>&lt;sourcefile&gt;</code> is a PureBasic or SpiderBasic source file.</p>
+<p>… where <code>&lt;sourcefile&gt;</code> is a source of one of the languages supported by Doxter
+(PureBasic, SpiderBasic or Alan).</p>
 </div>
 </div>
 </div>
@@ -857,27 +860,40 @@ system <code>PATH</code> environment variable.</p>
 <div class="sect2">
 <h3 id="_input_file_validation">Input File Validation</h3>
 <div class="paragraph">
-<p>Doxter checks that the passed <code>&lt;sourcefile&gt;</code> parameter has a valid extension:</p>
+<p>Doxter checks that the passed <code>&lt;sourcefile&gt;</code> parameter has a valid extension,
+and then sets the Doxter Engine language accordingly:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>.pb</code> &#8201;&#8212;&#8201;PureBasic source file.</p>
-</li>
-<li>
-<p><code>.pbi</code>&#8201;&#8212;&#8201;PureBasic include file.</p>
-</li>
-<li>
-<p><code>.pbf</code>&#8201;&#8212;&#8201;PureBasic form file.</p>
-</li>
-<li>
-<p><code>.sb</code> &#8201;&#8212;&#8201;SpiderBasic source file.</p>
-</li>
-</ul>
+<div class="hdlist">
+<table>
+<tr>
+<td class="hdlist1">
+<code>pb</code>, <code>pbi</code>, <code>pbf</code> 
+</td>
+<td class="hdlist2">
+<p>&#8594; PureBasic</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>sb</code>, <code>sbi</code>, <code>sbf</code> 
+</td>
+<td class="hdlist2">
+<p>&#8594; SpiderBasic</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>alan</code>, <code>i</code>        
+</td>
+<td class="hdlist2">
+<p>&#8594; Alan</p>
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>If the file extension doesn&#8217;t match, Doxter will report an error and abort
-with Status Error 1.</p>
+<p>If the file extension doesn&#8217;t match any of the supported extensions, Doxter
+will report an error and abort with Status Error 1.</p>
 </div>
 <div class="paragraph">
 <p>Doxter will also check that the file exists, it&#8217;s not a directory, and it&#8217;s
@@ -1030,6 +1046,12 @@ markers:</p>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>SpiderBasic uses the same comments delimiter as PureBasic. As for Alan,
+just use its native comment delimiter (<code>--</code>) instead of <code>;</code>&#8201;&#8212;&#8201;i.e. <code>-&#8594;</code>,
+<code>--|</code>, <code>--~</code>, etc. The same applies to any other languages that will be
+supported in the future.</p>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -1038,10 +1060,11 @@ markers:</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>You can freely use PureBasic&#8217;s special comments marks (<code>;{</code>/<code>;}</code>/<code>;-</code>) within
-Doxter&#8217;s markers (e.g. <code>;{&gt;</code>, <code>;}~</code>, <code>;-|</code>, etc.) execpt in the ADoc Header
-marker, which must be <code>;=</code>.
-This allows you to create regions which are foldable in PureBasic IDE.</p>
+<p>In PureBasic and SpiderBasic you can freely use the special comments marks
+(<code>;{</code>/<code>;}</code>/<code>;-</code>) within Doxter&#8217;s markers (e.g. <code>;{&gt;</code>, <code>;}~</code>, <code>;-|</code>, etc.)
+execpt in the ADoc Header marker, which can only be <code>;=</code>.
+This allows you to create regions which are foldable in PureBasic&#8217;s and
+SpiderBasic&#8217;s native IDEs.</p>
 </div>
 </td>
 </tr>
@@ -1139,14 +1162,14 @@ Here&#8217;s an example from the very source of Doxter:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-purebasic hljs" data-lang="purebasic">;= Doxter: Docs-Generator from PB Sources.
+<pre class="highlightjs highlight"><code class="language-purebasic hljs" data-lang="purebasic">;= Doxter: A Docs from Sources Generator.
 ;| Tristano Ajmone, &lt;tajmone@gmail.com&gt;
-;| v0.2.0-alpha, October 3, 2018: Public Alpha
+;| v0.2.1-alpha, October 10, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.2.0-alpha"
+#DOXTER_VER$ = "0.2.1-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
@@ -1303,11 +1326,11 @@ Here is a list of upcoming features, waiting to be implemented.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Support Other Languages</strong>.
-Doxter will be usable with languages other than PureBasic by providing a
-set of natively supported languages and by allowing to specify via command
-line options a custom comment delimiter and the default language name to
-be used in AsciiDoc source code blocks.</p>
+<p><strong>Support More Languages</strong>.
+The ultimate goal is to make Doxter a language agnostic tool, usable with
+any language, by extending the set of natively supported languages and by
+allowing to specify via command line options a custom comment delimiter and
+set the default language name to be used in AsciiDoc source code blocks.</p>
 </li>
 <li>
 <p><strong>Configuration Files</strong>.
@@ -1338,6 +1361,34 @@ projects.</p>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
+<li>
+<p><strong>v0.2.1-alpha</strong> (2018/10/10)&#8201;&#8212;&#8201;Add Alan IF support.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Now Doxter will detect from the input file&#8217;s extension whether it&#8217;s a
+PureBasic, SpiderBasic or Alan IF source file, and set the comment delimiter
+and base language (to use in ADoc source blocks) accordingly.</p>
+</li>
+<li>
+<p>The supported extensions, and associated languages now are:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>pb</code>, <code>pbi</code>, <code>pbf</code> &#8594; PureBasic</p>
+</li>
+<li>
+<p><code>sb</code>, <code>sbi</code>, <code>sbf</code> &#8594; SpiderBasic</p>
+</li>
+<li>
+<p><code>alan</code>, <code>i</code>        &#8594; Alan</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p><strong>v0.2.0-alpha</strong> (2018/10/03)&#8201;&#8212;&#8201;Move Doxter Engine to separate module:</p>
 <div class="ulist">
@@ -1433,8 +1484,8 @@ one encountered will override the previous ones.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.2.0-alpha<br>
-Last updated 2018-10-03 14:25:37 ora legale Europa occidentale
+Version 0.2.1-alpha<br>
+Last updated 2018-10-10 22:21:26 ora legale Europa occidentale
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">

@@ -437,8 +437,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Doxter Engine</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">version 0.0.1-alpha,</span>
-<span id="revdate">October 3, 2018</span>
+<span id="revnumber">version 0.0.2-alpha,</span>
+<span id="revdate">October 10, 2018</span>
 <br><span id="revremark">Public Alpha</span>
 </div>
 <div id="toc" class="toc2">
@@ -573,6 +573,12 @@ markers:</p>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>SpiderBasic uses the same comments delimiter as PureBasic. As for Alan,
+just use its native comment delimiter (<code>--</code>) instead of <code>;</code>&#8201;&#8212;&#8201;i.e. <code>-&#8594;</code>,
+<code>--|</code>, <code>--~</code>, etc. The same applies to any other languages that will be
+supported in the future.</p>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -581,10 +587,11 @@ markers:</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>You can freely use PureBasic&#8217;s special comments marks (<code>;{</code>/<code>;}</code>/<code>;-</code>) within
-Doxter&#8217;s markers (e.g. <code>;{&gt;</code>, <code>;}~</code>, <code>;-|</code>, etc.) execpt in the ADoc Header
-marker, which must be <code>;=</code>.
-This allows you to create regions which are foldable in PureBasic IDE.</p>
+<p>In PureBasic and SpiderBasic you can freely use the special comments marks
+(<code>;{</code>/<code>;}</code>/<code>;-</code>) within Doxter&#8217;s markers (e.g. <code>;{&gt;</code>, <code>;}~</code>, <code>;-|</code>, etc.)
+execpt in the ADoc Header marker, which can only be <code>;=</code>.
+This allows you to create regions which are foldable in PureBasic&#8217;s and
+SpiderBasic&#8217;s native IDEs.</p>
 </div>
 </td>
 </tr>
@@ -965,7 +972,20 @@ SOFTWARE.</p>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>v0.0.1-alpha</strong> (2018/10/xx)&#8201;&#8212;&#8201;First module engine release.</p>
+<p><strong>v0.0.2-alpha</strong> (2018/10/10)&#8201;&#8212;&#8201;Add support for Alan language, and improve
+SpiderBasic support:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The Engine now exposes a <code>dox::SetEngineLang(lang.s)</code> procedure to allow
+setting the comment delimiter and the language of source blocks according
+to the selected language (<code>"PureBasic"</code>, <code>"SpiderBasic"</code> or <code>"Alan"</code>).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>v0.0.1-alpha</strong> (2018/10/03)&#8201;&#8212;&#8201;First module engine release.</p>
 </li>
 </ul>
 </div>
@@ -974,8 +994,8 @@ SOFTWARE.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.0.1-alpha<br>
-Last updated 2018-10-03 14:25:37 ora legale Europa occidentale
+Version 0.0.2-alpha<br>
+Last updated 2018-10-10 22:21:26 ora legale Europa occidentale
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">

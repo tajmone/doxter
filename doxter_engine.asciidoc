@@ -1,6 +1,6 @@
 = Doxter Engine
 Tristano Ajmone, <tajmone@gmail.com>
-v0.0.1-alpha, October 3, 2018: Public Alpha
+v0.0.2-alpha, October 10, 2018: Public Alpha
 :License: MIT License
 :PureBASIC: 5.62
 :toclevels: 3
@@ -73,12 +73,18 @@ markers:
 ¦ ;< ¦ Region End   ¦ Marks end of a tagged region.
 |============================================================================
 
+SpiderBasic uses the same comments delimiter as PureBasic. As for Alan,
+just use its native comment delimiter (`--`) instead of `;` -- i.e. `-->`,
+`--|`, `--~`, etc. The same applies to any other languages that will be 
+supported in the future.
+
 [NOTE]
 =============================================================================
-You can freely use PureBasic's special comments marks (`;{`/`;}`/`;-`) within
-Doxter's markers (e.g. `;{>`, `;}~`, `;-|`, etc.) execpt in the ADoc Header
-marker, which must be `;=`.
-This allows you to create regions which are foldable in PureBasic IDE.
+In PureBasic and SpiderBasic you can freely use the special comments marks
+(`;{`/`;}`/`;-`) within Doxter's markers (e.g. `;{>`, `;}~`, `;-|`, etc.)
+execpt in the ADoc Header marker, which can only be `;=`.
+This allows you to create regions which are foldable in PureBasic's and
+SpiderBasic's native IDEs.
 =============================================================================
 
 The *Tagged Region End* marker has an alternative syntax to prevent Doxter
@@ -285,7 +291,12 @@ SOFTWARE.
 // tag::CHANGELOG[]
 == Changelog
 
-* *v0.0.1-alpha* (2018/10/xx) -- First module engine release.
+* *v0.0.2-alpha* (2018/10/10) -- Add support for Alan language, and improve
+  SpiderBasic support:
+** The Engine now exposes a `dox::SetEngineLang(lang.s)` procedure to allow
+   setting the comment delimiter and the language of source blocks according
+   to the selected language (`"PureBasic"`, `"SpiderBasic"` or `"Alan"`). 
+* *v0.0.1-alpha* (2018/10/03) -- First module engine release.
 
 // end::CHANGELOG[]
 // tag::region1[]
