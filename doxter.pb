@@ -1,11 +1,11 @@
 ﻿;= Doxter: A Docs from Sources Generator.
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.2.2-alpha, October 11, 2018: Public Alpha
+;| v0.2.3-alpha, October 11, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.2.2-alpha"
+#DOXTER_VER$ = "0.2.3-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
@@ -762,6 +762,10 @@ End 0
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
+;| * *v0.2.3-alpha* (2018/10/11) -- BUG FIX:
+;| ** Read Alan sources as ISO-8859-1. Add `dox::fileEnconding` var to allow 
+;|    setting file read operations for Alan sources to Ascii and avoid breaking 
+;|    special characters that were being read as if encoded in UTF-8.
 ;| * *v0.2.2-alpha* (2018/10/11) -- BUG FIX:
 ;| ** Corrupted filenames. A bug was corrupting output filenames of Alan source
 ;|    files with `.i` extension. Now fixed.

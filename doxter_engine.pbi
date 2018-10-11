@@ -1,6 +1,6 @@
 ﻿;= Doxter Engine
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.0.2-alpha, October 10, 2018: Public Alpha
+;| v0.0.3-alpha, October 11, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
@@ -80,6 +80,7 @@ Module dox
   ;-                       ENGINE SETTINGS & INITIALIZATION                       
   ; ==============================================================================
   sourcelang.s = "purebasic" ; Language for generated ADoc source code block
+  fileEncoding = #PB_UTF8    ; Input source file encoding
   headerMarker.s = ";="      ; ADoc Header Marker
   
   ; ==============================================================================
@@ -190,9 +191,11 @@ Module dox
   ;       the new ones; it's not necessary to free the old ones first!
   ; ------------------------------------------------------------------------------
   Procedure SetEngineLang(lang.s = "purebasic")
-    Shared sourcelang, headerMarker
+    Shared sourcelang, fileEncoding, headerMarker
     
+    ; Default Presets:
     commDel.s = #PB_CommDelim
+    fileEncoding = #PB_UTF8
     
     Select LCase(lang)
       Case "spiderbasic"
@@ -203,6 +206,7 @@ Module dox
         ; TODO: Set lang to SpiderBasic
         sourcelang = "alan"
         commDel = "--"
+        fileEncoding = #PB_Ascii ; ISO-8859-1
         headerMarker = "--="
       Default
         ; PureBasic settings fallback
@@ -242,13 +246,13 @@ Module dox
     ;| These are two different parsers altogether, and Doxter always runs the fed
     ;| source file against both of them, in the exact order specified above.
     ;}<---------------------------------------------------------------------------
-    Shared sourcelang, headerMarker
+    Shared sourcelang, fileEncoding, headerMarker
     Shared RegionsL()
     Shared HeaderL()
     
     ; TODO: Src File Ecoding: Could implement encoding via options for non PB files.
     #InFileFlags = #PB_File_SharedWrite | #PB_File_SharedRead   
-    fileH = ReadFile(#PB_Any, SrcFileName, #InFileFlags)
+    fileH = ReadFile(#PB_Any, SrcFileName, #InFileFlags | fileEncoding)
     FileBuffersSize(fileH, 4096 * 5)
     
     If Not fileH
@@ -1137,6 +1141,10 @@ EndModule
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
+;| * *v0.0.3-alpha* (2018/10/11) -- BUG FIX: Read Alan sources as ISO-8859-1:
+;| ** Add `fileEnconding` var to allow setting file read operations for Alan
+;|    sources to Ascii (`#PB_Ascii`) to avoid breaking special characters that
+;|    were being read as if encoded in UTF-8. 
 ;| * *v0.0.2-alpha* (2018/10/10) -- Add support for Alan language, and improve
 ;|   SpiderBasic support:
 ;| ** The Engine now exposes a `dox::SetEngineLang(lang.s)` procedure to allow

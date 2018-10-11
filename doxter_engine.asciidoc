@@ -1,6 +1,6 @@
 = Doxter Engine
 Tristano Ajmone, <tajmone@gmail.com>
-v0.0.2-alpha, October 10, 2018: Public Alpha
+v0.0.3-alpha, October 11, 2018: Public Alpha
 :License: MIT License
 :PureBASIC: 5.62
 :toclevels: 3
@@ -291,6 +291,10 @@ SOFTWARE.
 // tag::CHANGELOG[]
 == Changelog
 
+* *v0.0.3-alpha* (2018/10/11) -- BUG FIX: Read Alan sources as ISO-8859-1:
+** Add `fileEnconding` var to allow setting file read operations for Alan
+   sources to Ascii (`#PB_Ascii`) to avoid breaking special characters that
+   were being read as if encoded in UTF-8. 
 * *v0.0.2-alpha* (2018/10/10) -- Add support for Alan language, and improve
   SpiderBasic support:
 ** The Engine now exposes a `dox::SetEngineLang(lang.s)` procedure to allow

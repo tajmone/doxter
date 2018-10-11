@@ -437,8 +437,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Doxter Engine</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">version 0.0.2-alpha,</span>
-<span id="revdate">October 10, 2018</span>
+<span id="revnumber">version 0.0.3-alpha,</span>
+<span id="revdate">October 11, 2018</span>
 <br><span id="revremark">Public Alpha</span>
 </div>
 <div id="toc" class="toc2">
@@ -972,6 +972,18 @@ SOFTWARE.</p>
 <div class="ulist">
 <ul>
 <li>
+<p><strong>v0.0.3-alpha</strong> (2018/10/11)&#8201;&#8212;&#8201;BUG FIX: Read Alan sources as ISO-8859-1:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Add <code>fileEnconding</code> var to allow setting file read operations for Alan
+sources to Ascii (<code>#PB_Ascii</code>) to avoid breaking special characters that
+were being read as if encoded in UTF-8.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p><strong>v0.0.2-alpha</strong> (2018/10/10)&#8201;&#8212;&#8201;Add support for Alan language, and improve
 SpiderBasic support:</p>
 <div class="ulist">
@@ -994,8 +1006,8 @@ to the selected language (<code>"PureBasic"</code>, <code>"SpiderBasic"</code> o
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.0.2-alpha<br>
-Last updated 2018-10-10 22:21:26 ora legale Europa occidentale
+Version 0.0.3-alpha<br>
+Last updated 2018-10-11 22:57:12 ora legale Europa occidentale
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">
