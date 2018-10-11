@@ -1,6 +1,6 @@
 = Doxter: A Docs from Sources Generator.
 Tristano Ajmone, <tajmone@gmail.com>
-v0.2.1-alpha, October 10, 2018: Public Alpha
+v0.2.2-alpha, October 11, 2018: Public Alpha
 :License: MIT License
 :PureBASIC: 5.62
 :toclevels: 3
@@ -600,6 +600,9 @@ Here is a list of upcoming features, waiting to be implemented.
 // tag::CHANGELOG[]
 == Changelog
 
+* *v0.2.2-alpha* (2018/10/11) -- BUG FIX:
+** Corrupted filenames. A bug was corrupting output filenames of Alan source
+   files with `.i` extension. Now fixed.
 * *v0.2.1-alpha* (2018/10/10) -- Add Alan IF support.
 ** Now Doxter will detect from the input file's extension whether it's a
    PureBasic, SpiderBasic or Alan IF source file, and set the comment delimiter

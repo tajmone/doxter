@@ -1,6 +1,6 @@
 # Doxter, A PureBasic Documentation Generator
 
-    doxter v0.2.1-alpha (2018/10/10) | PureBasic 5.62 | MIT License
+    doxter v0.2.2-alpha (2018/10/11) | PureBasic 5.62 | MIT License
 
 Welcome to Doxter, a Documentation from source generator written in PureBasic for [PureBasic], [SpiderBasic] and [Alan IF] (more languages coming soon).
 

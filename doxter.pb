@@ -1,11 +1,11 @@
 ﻿;= Doxter: A Docs from Sources Generator.
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.2.1-alpha, October 10, 2018: Public Alpha
+;| v0.2.2-alpha, October 11, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.2.1-alpha"
+#DOXTER_VER$ = "0.2.2-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
@@ -130,8 +130,6 @@ dox::ParseFile(SrcFile)
 totRegions = ListSize(dox::RegionsL())
 PrintN("Total tagged regions found: "+ Str(totRegions))
 
-OutFile.s = SrcFile
-
 If ListSize(dox::HeaderL())
   ; ----------------------------
   ; Document Has AsciiDoc Header
@@ -167,7 +165,10 @@ Else
   OutExt.s = "adoc"
 EndIf
 PrintN(~"it will be saved with \"." + OutExt +~"\" extension.")
-OutFile = ReplaceString(OutFile, SrcExt, OutExt)
+
+SrcExtPos =  Len(SrcFile) - Len(SrcExt)
+OutFile.s = ReplaceString(SrcFile, SrcExt, OutExt, #PB_String_CaseSensitive, SrcExtPos)
+
 PrintN("outfile: " + OutFile)
 
 ;  ================
@@ -761,6 +762,9 @@ End 0
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
+;| * *v0.2.2-alpha* (2018/10/11) -- BUG FIX:
+;| ** Corrupted filenames. A bug was corrupting output filenames of Alan source
+;|    files with `.i` extension. Now fixed.
 ;| * *v0.2.1-alpha* (2018/10/10) -- Add Alan IF support.
 ;| ** Now Doxter will detect from the input file's extension whether it's a
 ;|    PureBasic, SpiderBasic or Alan IF source file, and set the comment delimiter
