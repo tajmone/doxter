@@ -36,6 +36,10 @@ project.cfg
 *.app
 *.out
 
+## Alan IF
+##########
+*.a3c
+*.ifid
 
 ## Linux
 ########

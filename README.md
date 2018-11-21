@@ -188,6 +188,7 @@ Doxter is released under MIT License.
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+For the license terms and credits of third party components in the binary release of Doxter (added by the PureBasic compiler) read the full [`LICENSE`](./LICENSE) file.
 
 # Third Party Components
 

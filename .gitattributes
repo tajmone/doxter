@@ -25,12 +25,20 @@
 *.pbf      text
 *.cfg      text
 
-## ASM (Fasm/Yasm)
-## ---------------
-*.ASM      text
-*.asm      text
-*.INC      text
-*.inc      text
+## SpiderBASIC
+## ---------
+*.sb       text
+*.sbi      text
+*.sbp      text
+
+## Alan IF
+## -------
+*.a3c      binary
+*.alan     text
+*.i        text
+*.ifid     text
+*.sav      binary
+
 
 ## Shell scripts
 ## -------------
@@ -171,7 +179,4 @@ LICENSE      text
 *.pbp    linguist-generated=true
 *.pbp    linguist-language=XML
 
-## ============
-## Pandoc files
-## ------------
-*.html5  linguist-language=HTML
+# EOF #

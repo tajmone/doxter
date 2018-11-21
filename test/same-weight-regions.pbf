@@ -1,0 +1,67 @@
+﻿;= Same Weight Regions Test
+;| Tristano Ajmone, <tajmone@gmail.com>
+;| v1, November 21, 2018: Basic Test
+
+; ------------------------------------------------------------------------------
+; The purpose of this test is to check how Doxter treates regions with same
+; weights and fragments with same subweights.
+; 
+; The epxected behaviour is that regions will end up asciibetically sorted in
+; the final document. As for subregions, their order of appearance in the
+; document should be preserved when merging them.
+; 
+; Bare in mind that, to optimize speed and memory, Doxter only fakes mergingthe
+; regions lists are not actually merged together in memory, only in the output
+; file. Therefore testing for the expected results is important.
+; ------------------------------------------------------------------------------
+
+;>ccc(666.666)
+;| == 3. Lorem Ipsum Dolor Sit Amet
+
+;| § 3.1 -- Lorem ipsum dolor sit amet, in usu iuvaret interesset
+;| signiferumque, ad quaestio conceptam scribentur vim. Cu diam reque sit, in
+;| solum porro saperet nec, eu per quas inimicus.
+;<
+
+; !!! IF YOU CAN SEE ME THERE'S A BUG !!!
+
+;>bbb(666.666)
+;| == 2. Lorem Ipsum Dolor Sit Amet
+;<
+
+; !!! IF YOU CAN SEE ME THERE'S A BUG !!!
+
+;>ccc(666.666)
+;| § 3.2 -- Lorem ipsum dolor sit amet, in usu iuvaret interesset
+;| signiferumque, ad quaestio conceptam scribentur vim. Cu diam reque sit, in
+;| solum porro saperet nec, eu per quas inimicus.
+;<
+
+; !!! IF YOU CAN SEE ME THERE'S A BUG !!!
+
+;>aaa(666.666)
+;| == 1. Lorem Ipsum Dolor Sit Amet
+;|   
+;| § 1.1 -- Lorem ipsum dolor sit amet, in usu iuvaret interesset
+;| signiferumque, ad quaestio conceptam scribentur vim. Cu diam reque sit, in
+;| solum porro saperet nec, eu per quas inimicus.
+
+; ====================
+; § 1.2 - Code Example
+; ====================
+For i=1 To 10
+  Debug "i = " + Str(i)
+Next
+;<
+
+;>bbb(666.666)
+;| § 2.1 -- Lorem ipsum dolor sit amet, in usu iuvaret interesset
+;| signiferumque, ad quaestio conceptam scribentur vim. Cu diam reque sit, in
+;| solum porro saperet nec, eu per quas inimicus.
+;| 
+;| § 2.2 -- Lorem ipsum dolor sit amet, in usu iuvaret interesset
+;| signiferumque, ad quaestio conceptam scribentur vim. Cu diam reque sit, in
+;| solum porro saperet nec, eu per quas inimicus.
+;<
+
+; EOF ;

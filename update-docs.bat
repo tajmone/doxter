@@ -1,4 +1,4 @@
-:: "update-docs.bat" v0.1.0 (2018-10-03)
+:: "update-docs.bat" v0.1.1 (2018-11-21)
 :: -----------------------------------------------------------------------------
 :: Update Doxter documentation to "docs" folder (served on GitHub pages too).
 :: -----------------------------------------------------------------------------
@@ -27,9 +27,11 @@ CALL asciidoctor^
   --verbose^
   -S unsafe^
   -a data-uri^
-  -a icons=font^
-  -a toc=left^
   -a experimental^
+  -a icons=font^
+  -a reproducible^
+  -a sectanchors^
+  -a toc=left^
   -a source-highlighter=highlightjs^
   -a highlightjsdir=hjs^
   -o docs/index.html^
@@ -44,9 +46,11 @@ CALL asciidoctor^
   --verbose^
   -S unsafe^
   -a data-uri^
-  -a icons=font^
-  -a toc=left^
   -a experimental^
+  -a icons=font^
+  -a reproducible^
+  -a sectanchors^
+  -a toc=left^
   -a source-highlighter=highlightjs^
   -a highlightjsdir=hjs^
   -a maindoc=index.asciidoc^
