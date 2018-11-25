@@ -1,6 +1,6 @@
 ﻿;= Doxter Engine
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.0.3-alpha, October 11, 2018: Public Alpha
+;| v0.0.4-alpha, Novermber 25, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
@@ -61,9 +61,6 @@ Module dox
   ; ============================================================================
   ;- PRIVATE PROCEDURES DECLARATION
   ; ============================================================================
-  Declare    IsAdocComment(codeline.s)
-  Declare    IsSkipComment(codeline.s)
-  Declare.s  StripCommentLine(codeline.s)
   Declare    ADocSourceStart(weight = 0)
   Declare    ADocSourceEnd(weight = 0)
   Declare.s  LinePreview(text.s, LineNum = 0, weight = 0, subweight = 0)
@@ -137,11 +134,27 @@ Module dox
   
   #PB_CommDelim = ";[{}\-]?" ; either:   ;   ;{   ;}   ;-
   
+  ; Markers:
   #mrk_RegionStart = ">"
   #mrk_RegionEnd   = "<"
-  #mrk_ADocLine    = "\|"
+  #mrk_ADocLine    = "|"
   #mrk_SkipLine    = "~"
- 
+  
+  ; Valid Region Parser Markers:
+  #mrk_any = "["+#mrk_RegionStart + #mrk_RegionEnd + "\"+ #mrk_ADocLine + #mrk_SkipLine +"]"
+  
+  ; Valid ADoc Header linr Markers (only '|' or '~'):
+  #mrk_head = "["+ "\"+ #mrk_ADocLine + #mrk_SkipLine +"]"
+  ; NOTE: This RegEx is used after the "=" has been found on 1st line, on the
+  ;       lines that follow the header marker, to establish if they are are
+  ;       valid Header lines or if the Header has ended!
+  
+  ; Modifiers:
+  #mod_RegionStart = ">"
+  #mod_RegionEnd   = "<"
+  
+  #mod_any = "["+#mod_RegionStart + #mod_RegionEnd +"]"
+  
   ;}==============================================================================
   ;- Doxter Markers RegExs
   ;{==============================================================================
@@ -151,40 +164,49 @@ Module dox
   Enumeration RegExsIDs
     ; Empty enum needed to get RegExsIDs's #PB_Compiler_EnumerationValue
   EndEnumeration
-  #RE_MarksFirst = #PB_Compiler_EnumerationValue
+  #RE_Id_EngineFirst = #PB_Compiler_EnumerationValue
   
   Enumeration RegExsIDs
-    #RE_TagRegionBegin
-    #RE_TagRegionEnd
-    #RE_ADocComment
-    #RE_SkipComment
+    #RE_HeaderParseLine
+    #RE_RegionParseLine
+    #RE_RegionBeginOpts
   EndEnumeration
-  #RE_MarksLast = #PB_Compiler_EnumerationValue -1
-  #RE_MarksTot  = #PB_Compiler_EnumerationValue - #RE_MarksFirst
+  #RE_Id_EngineLast = #PB_Compiler_EnumerationValue -1
+  #RE_Id_EngineTot  = #PB_Compiler_EnumerationValue - #RE_Id_EngineFirst
   
-    DataSection
-    ; Here we store the only end part of the RegExs
-    REGEX_PATTERNS:
-    Data.s #mrk_RegionStart +         ; #RE_TagRegionBegin -- Named groups:
-           "(?<tag>\w*)"+             ;   <tag>                   (optional)
-           "(\("+                     ;
-           "(?<weight>\d*)?"+         ;   <weight>                (optional)
-           "(\.(?<subweight>\d+))?"+  ;   <subweight>             (optional)
-           "\))?"                     ;
-    Data.s #mrk_RegionEnd +           ; #RE_TagRegionEnd -- Named groups:
-           "(?<modifier>[<]?)"        ;   <modifier>              (optional)
-    Data.s #mrk_ADocLine +" ?(.*)$"   ; #RE_ADocComment
-    Data.s #mrk_SkipLine              ; #RE_SkipComment
+  ; Some RegExs in the DataSection need the comment delimiter RegEx suffixed to
+  ; them (since its dynamically calculated, it can't be stored here):
+  #Requires_CommDel = #True
+  #No_CommDel  = #False
+  
+  DataSection
+    REGEX_PATTERNS:                         ; ----------------------------------
+    Data.i #Requires_CommDel                ; #RE_HeaderParseLine - Named groups:
+    Data.s "(?<marker>"+ #mrk_head +")\s?"+ ;   <marker>
+           "(?<linetail>.*)$"               ;   <linetail>            (optional)
+                                            ; ----------------------------------
+    Data.i #Requires_CommDel                ; #RE_RegionParseLine - Named groups:
+    Data.s "(?<marker>"+ #mrk_any +")" +    ;   <marker>
+           "(?<modifier>"+ #mod_any +"?)" + ;   <modifier>            (optional)
+           "(?<options>[\S]*)\s?" +         ;   <options>             (optional)
+           "(?<linetail>.*)$"               ;   <linetail>            (optional)
+                                            ; ----------------------------------
+    Data.i #No_CommDel                      ; #RE_RegionBeginOpts - Named groups:
+    Data.s "(?<tag>\w*)" +                  ;   <tag>                 (optional)
+           "(\("+                           ;
+           "(?<weight>\d*)?" +              ;   <weight>              (optional)
+           "(\.(?<subweight>\d+))?" +       ;   <subweight>           (optional)
+           "\))?"                           ;
   EndDataSection
   
-  SetEngineLang() ; FIXME: Call SetEngineLang()
+  SetEngineLang()
   ;}==============================================================================
   ;- SetEngineLang()
   ;{==============================================================================
   ; This procedure initializes the engine according to passed lang and comment
   ; delimiter parameters:
   ; - [x] Creates all the required Markers RegExs.
-  ; - [ ] Set the default language to use in ADoc source blocks.
+  ; - [x] Set the default language to use in ADoc source blocks.
   ; Currently designed to be invoked just once (not ready to handle multiple parsings
   ; with different settings).
   ; NOTE: SetEngineLang() can recreate the RegExs, the old ones will be replaced by
@@ -199,11 +221,9 @@ Module dox
     
     Select LCase(lang)
       Case "spiderbasic"
-        ; TODO: Set lang to SpiderBasic
         sourcelang = "spiderbasic"
         headerMarker = ";="
       Case "alan"
-        ; TODO: Set lang to SpiderBasic
         sourcelang = "alan"
         commDel = "--"
         fileEncoding = #PB_Ascii ; ISO-8859-1
@@ -214,17 +234,28 @@ Module dox
         headerMarker = ";="
     EndSelect
     
+    ;- Build RegExs Dynamically
     Restore REGEX_PATTERNS
-    For i=#RE_MarksFirst To #RE_MarksLast
+    For i=#RE_Id_EngineFirst To #RE_Id_EngineLast
+      ; The returned boolean tells us if we need to add a suffix to the patterns
+      ; (which can't be stored in static data or a const due to comment delimiter
+      ; depending on the source file language).
+      Read.i Req_CommDel
+      If Req_CommDel
+        RE_Suffix.s = "^\s*" + commDel
+      Else
+        RE_Suffix = #Empty$
+      EndIf
       Read.s RE_Pattern$
-      If Not CreateRegularExpression(i, "^\s*" + commDel + RE_Pattern$)
+      If Not CreateRegularExpression(i, RE_Suffix + RE_Pattern$)
+        ; TODO: Handle CreateRegEx fails: add Abort(err_msg)
         Debug "ERROR: Couldn't create RegEx #" + Str(i)
         End 1
       EndIf
     Next
   EndProcedure
   ;}
-
+  
   
   ; ****************************************************************************
   ; *                                                                          *
@@ -232,7 +263,7 @@ Module dox
   ; *                                                                          *
   ; ****************************************************************************
   Procedure ParseFile(SrcFileName.s)
-;     PrintN(">>> dox::ParseFile("+SrcFileName+")") ; DELME Proc Enter Debug
+    ;     PrintN(">>> dox::ParseFile("+SrcFileName+")") ; DELME Proc Enter Debug
     ;{>two_steps_parsing(4010)
     ;~----------------------------------------------------------------------------
     ;| Doxter uses a two-steps parsing approach when processing documents:
@@ -366,14 +397,25 @@ Module dox
       Repeat
         FilePos = Loc(fileH) ; Store current position in case we need to rollback
         CurrLine.s = ReadString(fileH)
-        If IsSkipComment(CurrLine)
-          ; Skip Comment Lines are allowed, just ignore them and carry on parsing.
-          cntLine +1
-        ElseIf IsAdocComment(CurrLine)
-          AddElement(HeaderL())
-          HeaderL() = StripCommentLine(CurrLine)
-          HeaderLinePreview(HeaderL(), cntLine)
-          cntLine +1
+        If MatchRegularExpression(#RE_HeaderParseLine, CurrLine)
+          If ExamineRegularExpression(#RE_HeaderParseLine, CurrLine)
+            NextRegularExpressionMatch(#RE_HeaderParseLine)
+            ; ///// Extract Doxter Marker /////
+            lineMark.s = RegularExpressionNamedGroup(#RE_HeaderParseLine, "marker")
+            ; ///// Extract Trailing Text /////
+            lineTail.s = RegularExpressionNamedGroup(#RE_HeaderParseLine, "linetail")
+            ; TODO: Add RegEx Else clause to catch potential errors and abort with msg  
+          EndIf
+          ; TODO: Convert in Select and raise error if didn't match any of these two!
+          If lineMark = #mrk_SkipLine
+            ; Skip Comment Lines are allowed, just ignore them and carry on parsing.
+            cntLine +1
+          ElseIf lineMark = #mrk_ADocLine
+            AddElement(HeaderL())
+            HeaderL() = lineTail
+            HeaderLinePreview(HeaderL(), cntLine)
+            cntLine +1
+          EndIf
         Else
           ; Rollback file position and exit loop
           FileSeek(fileH, FilePos, #PB_Absolute)
@@ -468,30 +510,73 @@ Module dox
     ; Scan every line of the source file until EOF
     While Eof(fileH) = 0
       CurrLine.s = ReadString(fileH)
-      ; TODO: optimize: Use a RegEx to check if any marker matches, instead of multiple checks.
+      ; ================
+      ; NEW REGEX SYSTEM
+      ;{ ================
+      ; The new #RE_RegionParseLine regex is used to establish beforehand if the
+      ; current line is a Doxter line or not, and if it is it extracts the
+      ; Marker, its Modifier, its Options and the remaining line tail into
+      ; separate vars, so that a single RegEx is run once per line source,
+      ; allowing the code to get faster and slimmer.
+      ; ------------------------------------------------------------------------
+      If MatchRegularExpression(#RE_RegionParseLine, CurrLine)
+        If ExamineRegularExpression(#RE_RegionParseLine, CurrLine)
+          NextRegularExpressionMatch(#RE_RegionParseLine)
+          ; ///// Extract Doxter Marker /////
+          lineMark.s = RegularExpressionNamedGroup(#RE_RegionParseLine, "marker")
+          ; ///// Extract Marker Modifier /////
+          lineModf.s = RegularExpressionNamedGroup(#RE_RegionParseLine, "modifier")
+          ; ///// Extract Marker Options /////
+          lineOpts.s = RegularExpressionNamedGroup(#RE_RegionParseLine, "options")
+          ; ///// Extract Trailing Text /////
+          lineTail.s = RegularExpressionNamedGroup(#RE_RegionParseLine, "linetail")
+          
+          ; DBG DELME: PREVIEW FOUND MARKERS
+          ; LinePreview(CurrLine, cntLine, 666, 666)
+          ; LinePreview("DBG Marker:     '"+ lineMark +"'", cntLine, 666, 666)
+          ; LinePreview("DBG MarkerMod:  '"+ lineModf +"'", cntLine, 666, 666)
+          ; LinePreview("DBG MarkerOpts: '"+ lineOpts +"'", cntLine, 666, 666)
+          ; LinePreview("DBG Linetail:   '"+ lineTail +"'", cntLine, 666, 666)
+          ; TODO: Add RegEx Else clause to catch potential errors and abort with msg  
+        EndIf
+      Else
+        ; DBG DELME: PREVIEW NON DOXTER LINES
+        ; LinePreview("DBG NOT DOX: "+CurrLine, cntLine, currWeight, currSubweight)
+        lineMark.s  = #Empty$
+        lineModf.s  = #Empty$
+        lineOpts.s  = #Empty$
+        lineTail.s  = #Empty$
+      EndIf
+      ;}------------------------------------------------------------------------
+      ; TODO: Further optimize by branching the code intwo a block handling no
+      ;       Doxter line encountered, and the other handling found Markers!
+      ; TODO: Add warning tracker to stack non-fatal errors, and add warnings for
+      ;       malformed or non-expected Marker Options!
+      ; ------------------------------------------------------------------------
       Select ParserState
         Case #Seeking
           ; ~~~~~~~~~~~~~~~~~~~~~~~~~
           ; Parser Looking for Tag...
           ; ~~~~~~~~~~~~~~~~~~~~~~~~~
-          If MatchRegularExpression(#RE_TagRegionBegin, CurrLine)
+          If lineMark = #mrk_RegionStart
             ;  =========================
             ;- Region Start Marker Found
             ;  =========================
             ParserState = #InsideRegion
-            If ExamineRegularExpression(#RE_TagRegionBegin, CurrLine)
-              NextRegularExpressionMatch(#RE_TagRegionBegin)
+            If ExamineRegularExpression(#RE_RegionBeginOpts, lineOpts)
+              NextRegularExpressionMatch(#RE_RegionBeginOpts)
               ; ///// Establish Region's Tag /////
-              currTag = RegularExpressionNamedGroup(#RE_TagRegionBegin, "tag")
+              currTag = RegularExpressionNamedGroup(#RE_RegionBeginOpts, "tag")
               If currTag = #Empty$
                 ; No Tag ID found, create one:
                 ; ----------------------------
                 currTag = #FallbackTag + Str(FallbackCnt)
                 FallbackCnt +1
               EndIf
-              RegionIsNotNew = FindMapElement(RegionsTrackM(), currTag) ; NOTE: Map keys are case-sensitive!
-                                                                        ; ///// Establish Region's Weight /////
-              parsedWeight.s = RegularExpressionNamedGroup(#RE_TagRegionBegin, "weight")
+              ; NOTE: Map keys are case-sensitive:
+              RegionIsNotNew = FindMapElement(RegionsTrackM(), currTag)
+              ; ///// Establish Region's Weight /////
+              parsedWeight.s = RegularExpressionNamedGroup(#RE_RegionBeginOpts, "weight")
               If parsedWeight = #Empty$
                 ; No Tag Weight found, auto-generate it
                 ; -------------------------------------
@@ -505,7 +590,7 @@ Module dox
                 currWeight = Val(parsedWeight)
               EndIf
               ; ///// Establish Region's Subweight /////
-              parsedSubweight.s = RegularExpressionNamedGroup(#RE_TagRegionBegin, "subweight")
+              parsedSubweight.s = RegularExpressionNamedGroup(#RE_RegionBeginOpts, "subweight")
               If parsedSubweight = #Empty$
                 ; No Tag Subweight found, auto-generate it
                 ; -------------------------------------
@@ -517,6 +602,7 @@ Module dox
               Else
                 currSubweight = Val(parsedSubweight)
               EndIf
+              ; TODO: Add RegEx Else clause to catch potential errors and abort with msg  
             EndIf
             ; ----------------------------
             ; Add New Region to List
@@ -548,30 +634,26 @@ Module dox
           ; ~~~~~~~~~~~~~~~~~~~~~~~~~
           ; Carry-On Tag Parsing...
           ; ~~~~~~~~~~~~~~~~~~~~~~~~~
-          If MatchRegularExpression(#RE_TagRegionEnd, CurrLine)
+          If lineMark = #mrk_RegionEnd
             ;  =======================
             ;- Region End Marker Found
             ;  =======================
             ParserState = #Seeking
-            If ExamineRegularExpression(#RE_TagRegionEnd, CurrLine)
-              NextRegularExpressionMatch(#RE_TagRegionEnd)
-              modifier.s = RegularExpressionNamedGroup(#RE_TagRegionEnd, "modifier")
-              ; If there was an open source block close it:
-              If AddingCode
-                ADocSourceEnd(currWeight)
-                AddingCode = #False
-              EndIf
-              ; AsciiDoc Tag End Line Preview
-              ; ------------------------------
-              LinePreview("// end::"+ currTag + "[]", cntLine, currWeight, currSubweight)
-              If Not modifier = "<"
-                ; Add blank line to ensure ADoc contents integrity.
-                With RegionsL()
-                  AddElement(\StringsL())
-                  \StringsL() = #Empty$
-                  LinePreview(\StringsL(), 0, currWeight, currSubweight)
-                EndWith
-              EndIf
+            ; If there was an open source block close it:
+            If AddingCode
+              ADocSourceEnd(currWeight)
+              AddingCode = #False
+            EndIf
+            ; AsciiDoc Tag End Line Preview
+            ; ------------------------------
+            LinePreview("// end::"+ currTag + "[]", cntLine, currWeight, currSubweight)
+            If Not lineModf = "<"
+              ; Add blank line to ensure ADoc contents integrity.
+              With RegionsL()
+                AddElement(\StringsL())
+                \StringsL() = #Empty$
+                LinePreview(\StringsL(), 0, currWeight, currSubweight)
+              EndWith
             EndIf
             currTag = #Empty$
           Else
@@ -588,26 +670,26 @@ Module dox
                 LinePreview(\StringsL(), cntLine, currWeight, currSubweight)
               EndWith
             Else
-              If IsAdocComment(CurrLine)
-                ;  ------------------------------
-                ;- Curr Line Is ADoc Comment Line
-                ;  ------------------------------
+              If lineMark = #mrk_ADocLine
+                ;  ------------------------------------
+                ;- Curr Line Is ADoc Comment Line ("|")
+                ;  ------------------------------------
                 If AddingCode ; Check if we were adding source code to contents
                   ADocSourceEnd(currWeight) ; Add closing source block delimiter
                   AddingCode = #False
                 EndIf
                 With RegionsL()
                   AddElement(\StringsL())
-                  \StringsL() = StripCommentLine(CurrLine)
+                  \StringsL() = lineTail
                   LinePreview(\StringsL(), cntLine, currWeight, currSubweight)
                 EndWith
-              ElseIf IsSkipComment(CurrLine)
-                ;  ------------------------------
-                ;- Curr Line Is Skip Comment Line
-                ;  ------------------------------
+              ElseIf lineMark =  #mrk_SkipLine
+                ;  ------------------------------------
+                ;- Curr Line Is Skip Comment Line ("~")
+                ;  ------------------------------------
                 ; It's a skip-me comment line (';~'), ignore it
               Else
-                ;  -----------------
+                ;  -----------------  
                 ;- Curr Line Is Code
                 ;  -----------------
                 If Not AddingCode
@@ -771,13 +853,13 @@ Module dox
     ;  ============
     SortStructuredList(RegionsL(), #PB_Sort_Ascending, OffsetOf(RegionData\Weight), TypeOf(RegionData\Weight))
     
-   
-;     PrintN("<<< dox::ParseFile("+SrcFileName+")") ; DELME Proc Exit Debug
+    
+    ;     PrintN("<<< dox::ParseFile("+SrcFileName+")") ; DELME Proc Exit Debug
   EndProcedure
   ; ------------------------------------------------------------------------------
   Procedure SaveDocFile(OutFile.s)
-;     PrintN(">>> dox::SaveDocFile("+OutFile+")") ; DELME Proc Enter Debug
-
+    ;     PrintN(">>> dox::SaveDocFile("+OutFile+")") ; DELME Proc Enter Debug
+    
     Shared HeaderL(), RegionsL()
     fileH = CreateFile(#PB_Any, OutFile, #PB_UTF8)
     If Not fileH
@@ -819,7 +901,7 @@ Module dox
     
     CloseFile(fileH)
     
-;     PrintN("<<< dox::SaveDocFile("+OutFile+")") ; DELME Proc Exit Debug
+    ;     PrintN("<<< dox::SaveDocFile("+OutFile+")") ; DELME Proc Exit Debug
   EndProcedure
   ; ------------------------------------------------------------------------------
   Procedure Abort(ErrMsg.s)
@@ -836,33 +918,6 @@ Module dox
   ;-                             PRIVATE PROCEDURES
   ; *                                                                          *
   ; ****************************************************************************
-
-  ; ------------------------------------------------------------------------------
-  Procedure IsAdocComment(codeline.s)
-    
-    If MatchRegularExpression(#RE_ADocComment, codeline)
-      ProcedureReturn #True
-    EndIf
-    
-  EndProcedure
-  ; ------------------------------------------------------------------------------
-  Procedure IsSkipComment(codeline.s)
-    
-    If MatchRegularExpression(#RE_SkipComment, codeline)
-      ProcedureReturn #True
-    EndIf
-    
-  EndProcedure
-  ; ------------------------------------------------------------------------------
-  Procedure.s StripCommentLine(codeline.s)
-    
-    If ExamineRegularExpression(#RE_ADocComment, codeline)
-      NextRegularExpressionMatch(#RE_ADocComment)
-      ProcedureReturn RegularExpressionGroup(#RE_ADocComment, 1)
-    EndIf
-    
-  EndProcedure
-  ; ------------------------------------------------------------------------------
   Procedure ADocSourceStart(weight = 0)
     Shared sourcelang
     Shared RegionsL()
@@ -882,7 +937,6 @@ Module dox
       LinePreview(\StringsL(), 0, weight)
       
     EndWith
-    
     
   EndProcedure
   ; ------------------------------------------------------------------------------
@@ -927,12 +981,12 @@ Module dox
     
     ;| [role="shell",subs="+quotes,+macros"]
     ;| ----------------------------------------------------------
-    ;||0099|4100|   1|region tag, which would split the text in multiple paragraphs in the final <1>
-    ;||0100|4100|   1|document.
-    ;||0101|4100|   1|// +++end::Comments_Marks[]+++ <2>
-    ;||    |4100|   1| <3>
-    ;||0169|4101|  10|// +++tag::CLI_Usage[]+++ <4>
-    ;||0170|4101|  10|=== Command Line Options
+    ;| |0099|4100|   1|region tag, which would split the text in multiple paragraphs in the final <1>
+    ;| |0100|4100|   1|document.
+    ;| |0101|4100|   1|// +++end::Comments_Marks[]+++ <2>
+    ;| |    |4100|   1| <3>
+    ;| |0169|4101|  10|// +++tag::CLI_Usage[]+++ <4>
+    ;| |0170|4101|  10|=== Command Line Options
     ;| ----------------------------------------------------------
     ;|
     ;| <1> Continuation lines of a region with weight `4100` and subweight `1`.
@@ -1141,6 +1195,16 @@ EndModule
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
+;| * *v0.0.4-alpha* (2018/11/25) -- Engine optimizations:
+;| ** The engine code has been slightly optimized to improve performance and
+;|    code maintainability:
+;| *** Reduced the number of RegExs used by the engine by optimizing reusability.
+;| *** Source lines parsing has been optimized in both the Header Parser and the
+;|     Regions Parser.
+;| *** Deleted internal procedures:
+;| **** `IsAdocComment()`
+;| **** `IsSkipComment()`
+;| **** `StripCommentLine()`
 ;| * *v0.0.3-alpha* (2018/10/11) -- BUG FIX: Read Alan sources as ISO-8859-1:
 ;| ** Add `fileEnconding` var to allow setting file read operations for Alan
 ;|    sources to Ascii (`#PB_Ascii`) to avoid breaking special characters that

@@ -437,8 +437,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Doxter Engine</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">version 0.0.3-alpha,</span>
-<span id="revdate">October 11, 2018</span>
+<span id="revnumber">version 0.0.4-alpha,</span>
+<span id="revdate">Novermber 25, 2018</span>
 <br><span id="revremark">Public Alpha</span>
 </div>
 <div id="toc" class="toc2">
@@ -485,7 +485,7 @@ Released under <a href="#_license">MIT License</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_about_doxter_engine">About Doxter Engine</h2>
+<h2 id="_about_doxter_engine"><a class="anchor" href="#_about_doxter_engine"></a>About Doxter Engine</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Doxter Engine is the module used by Doxter to parse source files, extract the
@@ -509,7 +509,7 @@ applications.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_engine_api">Engine API</h2>
+<h2 id="_engine_api"><a class="anchor" href="#_engine_api"></a>Engine API</h2>
 <div class="sectionbody">
 <div class="admonitionblock warning">
 <table>
@@ -530,7 +530,7 @@ learn about the API.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_doxter_markers_primer">Doxter Markers Primer</h2>
+<h2 id="_doxter_markers_primer"><a class="anchor" href="#_doxter_markers_primer"></a>Doxter Markers Primer</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The way Doxter decides which parts of your sorce code to treat as documentation
@@ -626,7 +626,7 @@ document.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_doxters_parser">Doxter&#8217;s Parser</h2>
+<h2 id="_doxters_parser"><a class="anchor" href="#_doxters_parser"></a>Doxter&#8217;s Parser</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Understanding how Doxter&#8217;s parser works will help you grasp a clearer picture
@@ -659,7 +659,7 @@ comment markers (or ignore them) is slightly different.
 Here follow the simple rules by which each parser abides.</p>
 </div>
 <div class="sect2">
-<h3 id="_header_parser_rules">Header Parser Rules</h3>
+<h3 id="_header_parser_rules"><a class="anchor" href="#_header_parser_rules"></a>Header Parser Rules</h3>
 <div class="paragraph">
 <p>The <strong>Header Parser</strong> has one single task, detect if the source contains an
 AsciiDoc Header and, if there is one, extract it and store it in memory.</p>
@@ -711,7 +711,7 @@ from stored pointer and relinquish control to the Regions Parser.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_regions_parser_rules">Regions Parser Rules</h3>
+<h3 id="_regions_parser_rules"><a class="anchor" href="#_regions_parser_rules"></a>Regions Parser Rules</h3>
 <div class="paragraph">
 <p>The task of the <strong>Regions Parser</strong> is to extract and process all lines that
 are enclosed between Region Start and Region End tags, and store them in
@@ -930,7 +930,7 @@ source to the AsciiDoc output and study it, if you like to learn by examples.</p
 </div>
 </div>
 <div class="sect1">
-<h2 id="_license">License</h2>
+<h2 id="_license"><a class="anchor" href="#_license"></a>License</h2>
 <div class="sectionbody">
 <div class="exampleblock">
 <div class="content">
@@ -967,10 +967,48 @@ SOFTWARE.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_changelog">Changelog</h2>
+<h2 id="_changelog"><a class="anchor" href="#_changelog"></a>Changelog</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
+<li>
+<p><strong>v0.0.4-alpha</strong> (2018/11/25)&#8201;&#8212;&#8201;Engine optimizations:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The engine code has been slightly optimized to improve performance and
+code maintainability:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Reduced the number of RegExs used by the engine by optimizing reusability.</p>
+</li>
+<li>
+<p>Source lines parsing has been optimized in both the Header Parser and the
+Regions Parser.</p>
+</li>
+<li>
+<p>Deleted internal procedures:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>IsAdocComment()</code></p>
+</li>
+<li>
+<p><code>IsSkipComment()</code></p>
+</li>
+<li>
+<p><code>StripCommentLine()</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
 <li>
 <p><strong>v0.0.3-alpha</strong> (2018/10/11)&#8201;&#8212;&#8201;BUG FIX: Read Alan sources as ISO-8859-1:</p>
 <div class="ulist">
@@ -1006,8 +1044,7 @@ to the selected language (<code>"PureBasic"</code>, <code>"SpiderBasic"</code> o
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.0.3-alpha<br>
-Last updated 2018-10-11 22:57:12 ora legale Europa occidentale
+Version 0.0.4-alpha<br>
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">

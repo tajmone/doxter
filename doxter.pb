@@ -1,11 +1,11 @@
 ﻿;= Doxter: A Docs from Sources Generator.
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.2.3-alpha, October 11, 2018: Public Alpha
+;| v0.2.4-alpha, Novermber 25, 2018: Public Alpha
 ;| :License: MIT License
 ;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.2.3-alpha"
+#DOXTER_VER$ = "0.2.4-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
@@ -53,13 +53,13 @@ PrintN("Doxter v" + #DOXTER_VER$)
 ; ==========================
 SrcFile.s = ProgramParameter()
 ;{>CLI_Usage(.10)--------------------------------------------------------------
-;|=== Command Line Options
+;| === Command Line Options
 ;|
 ;| To invoke Doxter via command prompt/shell:
 ;|
-;|--------------------
+;| -------------------
 ;| doxter <sourcefile>
-;|--------------------
+;| -------------------
 ;|
 ;| … where `<sourcefile>` is a source of one of the languages supported by Doxter
 ;| (PureBasic, SpiderBasic or Alan).
@@ -762,6 +762,9 @@ End 0
 ;{>CHANGELOG(20000)
 ;| == Changelog
 ;|
+;| * *v0.2.4-alpha* (2018/11/25) -- Engine optimizations:
+;| ** The engine code has been slightly optimized to improve performance and
+;|    code maintainability.
 ;| * *v0.2.3-alpha* (2018/10/11) -- BUG FIX:
 ;| ** Read Alan sources as ISO-8859-1. Add `dox::fileEnconding` var to allow 
 ;|    setting file read operations for Alan sources to Ascii and avoid breaking 
