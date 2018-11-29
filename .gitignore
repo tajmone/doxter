@@ -3,17 +3,26 @@
 # https://github.com/tajmone/doxter                                            #
 ################################################################################
 
-# TMP Work Files
+## TMP Work Files
+#################
 ___*.*
 
-# Based on ".gitignore" created by:
-# https://www.gitignore.io/api/windows,linux,macos,purebasic
-
-# Log Files
+# Log files
 *.log
+
 # Links and URLs
 *.lnk
 *.url
+
+# HTML previews
+README.html
+CHANGELOG.html
+
+## TMP Docs Files
+#################
+docs_src/*.html
+docs_src/*.asciidoc
+!docs_src/index.asciidoc
 
 ## PureBasic
 ############
@@ -40,6 +49,18 @@ project.cfg
 ##########
 *.a3c
 *.ifid
+
+#########################
+## USER-SPECIFIC FILES ##
+#########################
+# Reserved for patterns that might be useful to end users of the project.
+
+
+##########################
+## MISC IGNORE PATTERNS ##
+##########################
+# Based on ".gitignore" created by:
+# https://www.gitignore.io/api/windows,linux,macos,purebasic
 
 ## Linux
 ########
@@ -112,6 +133,4 @@ $RECYCLE.BIN/
 
 # End of https://www.gitignore.io/api/windows,linux,macos,purebasic
 
-# User-specific files
-#####################
-
+# EOF #

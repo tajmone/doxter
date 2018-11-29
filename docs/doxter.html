@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.7.1">
 <meta name="author" content="Tristano Ajmone, &lt;tajmone@gmail.com&gt;">
-<title>Doxter Engine</title>
+<title>Doxter: A Docs from Sources Generator.</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -434,36 +434,28 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>Doxter Engine</h1>
+<h1>Doxter: A Docs from Sources Generator.</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">doxter engine 0.0.5-alpha,</span>
+<span id="revnumber">doxter 0.2.5-alpha,</span>
 <span id="revdate">2018-11-29</span>
 <br><span id="revremark">PureBASIC 5.62</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_about_doxter_engine">About Doxter Engine</a></li>
-<li><a href="#_engine_api">Engine API</a></li>
-<li><a href="#_doxter_markers_primer">Doxter Markers Primer</a></li>
-<li><a href="#_doxter_parsers">Doxter Parsers</a>
-<ul class="sectlevel2">
-<li><a href="#_header_parser_rules">Header Parser Rules</a></li>
-<li><a href="#_regions_parser_rules">Regions Parser Rules</a></li>
-</ul>
-</li>
+<li><a href="#_command_line_options">Command Line Options</a></li>
+<li><a href="#_input_file_validation">Input File Validation</a></li>
+<li><a href="#_parsing_live_preview_during_execution">Parsing Live Preview During Execution</a></li>
 <li><a href="#_license">License</a></li>
 <li><a href="#_changelog">CHANGELOG</a></li>
+<li><a href="#_doxter_changelog">Doxter Changelog</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph">
-<p><a href="index.html">Back to Doxter CLI documentation</a>.</p>
-</div>
 <div class="exampleblock">
 <div class="content">
 <div class="imageblock" style="text-align: center">
@@ -472,9 +464,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="paragraph">
-<p>The Doxter Egine contains the core functionalities behind the Doxter CLI
-application, and can be included as a module in other applications and used
-to doxterize source files programmatically through its API.
+<p>Doxter is a binary tool to generate AsciiDoc documentation from  source
+files, by using a special notations in comments delimiters to markup tagged
+regions of text and code that will be exported to an AsciiDoc source document
+where the various regions will be sorted according to their tag&#8217;s weight.
+It currently supports PureBasic, SpiderBasic and Alan IF source files.
 Released under <a href="#_license">MIT License</a>.</p>
 </div>
 <div class="paragraph">
@@ -485,447 +479,159 @@ Released under <a href="#_license">MIT License</a>.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_about_doxter_engine"><a class="anchor" href="#_about_doxter_engine"></a>About Doxter Engine</h2>
+<h2 id="_command_line_options"><a class="anchor" href="#_command_line_options"></a>Command Line Options</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Doxter Engine is the module used by Doxter to parse source files, extract the
-documentation from them and write it to an AsciiDoc file&#8201;&#8212;&#8201;this process is
-also known as «doxterizing».</p>
+<p>To invoke Doxter via command prompt/shell:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>doxter &lt;sourcefile&gt;</pre>
+</div>
 </div>
 <div class="paragraph">
-<p>This module can also be included in other applications beside the Doxter CLI
-tool, so you can use it to create your own doxterizing apps.</p>
-</div>
-<div class="paragraph">
-<p>Currently, the module is still in Alpha and there is a long way to go before
-it will be optimized to work with other apps&#8201;&#8212;&#8201;custom options still need to
-be exposed publicly to allow fine gain control over its behavior, and right
-now all output text is sent to the console, so it will only work in console
-applications.</p>
-</div>
-<div class="paragraph">
-<p>This document deals with Doxter Engine&#8217;s API and internals.</p>
+<p>… where <code>&lt;sourcefile&gt;</code> is a source of one of the languages supported by Doxter
+(PureBasic, SpiderBasic or Alan).</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_engine_api"><a class="anchor" href="#_engine_api"></a>Engine API</h2>
+<h2 id="_input_file_validation"><a class="anchor" href="#_input_file_validation"></a>Input File Validation</h2>
 <div class="sectionbody">
-<div class="admonitionblock warning">
+<div class="paragraph">
+<p>Doxter checks that the passed <code>&lt;sourcefile&gt;</code> parameter has a valid extension,
+and then sets the Doxter Engine language accordingly:</p>
+</div>
+<div class="hdlist">
 <table>
 <tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
+<td class="hdlist1">
+<code>pb</code>, <code>pbi</code>, <code>pbf</code> 
 </td>
-<td class="content">
-<div class="paragraph">
-<p>The Doxter Engine API is not yet documented.
-Until Doxter enters the Beta stage, you&#8217;ll have to refer to source code to
-learn about the API.</p>
-</div>
+<td class="hdlist2">
+<p>&#8594; PureBasic</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>sb</code>, <code>sbi</code>, <code>sbf</code> 
+</td>
+<td class="hdlist2">
+<p>&#8594; SpiderBasic</p>
+</td>
+</tr>
+<tr>
+<td class="hdlist1">
+<code>alan</code>, <code>i</code>        
+</td>
+<td class="hdlist2">
+<p>&#8594; Alan</p>
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>If the file extension doesn&#8217;t match any of the supported extensions, Doxter
+will report an error and abort with Status Error 1.</p>
+</div>
+<div class="paragraph">
+<p>Doxter will also check that the file exists, it&#8217;s not a directory, and it&#8217;s
+not 0 Kb in size; and abort with Status Error if any of these are met.</p>
+</div>
+<div class="paragraph">
+<p>Depending on whether the source file contains or not an <a href="index.html#_asciidoc_header">AsciiDoc Header</a>,
+the output file will be named either <code>&lt;sourcefile&gt;.asciidoc</code> or
+<code>&lt;sourcefile&gt;.adoc</code>, respectively.
+At parsing completion, Doxter will inform the user wther it found a Header
+or not, and print the output filename to the console.</p>
+</div>
+<div class="paragraph">
+<p>This differentiation in the extension used in the output file is due to
+the conventions and needs of the PureBasic CodeArchiv project, where files
+with <code>.asciidoc</code> extension are considered stand-alone documents, which are
+subject to script-automated conversion to HTML; whereas files with <code>.adoc</code>
+extension are considered snippets file which are imported by other docs.
+Beside the different file extensions, both type of output files are formated
+as standard AsciiDoc documents (with Asciidoctor Ruby in mind).</p>
+</div>
+<div class="paragraph">
+<p>This is inline with the AsciiDoc standard which demands the presence of a
+document Header in a source file for it to be buildable as a standalone
+doc; and with the common practice of splitting large documents in smaller
+files, which are then imported into the main document and therefore don&#8217;t
+need a Header of their own.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_doxter_markers_primer"><a class="anchor" href="#_doxter_markers_primer"></a>Doxter Markers Primer</h2>
+<h2 id="_parsing_live_preview_during_execution"><a class="anchor" href="#_parsing_live_preview_during_execution"></a>Parsing Live Preview During Execution</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The way Doxter decides which parts of your sorce code to treat as documentation
-is by means of PureBasic&#8217;s comment delimiter (<code>;</code>) immediately followed by
-a character which, combined with the delimiter, comprise one of Doxter&#8217;s
-markers:</p>
+<p>During execution, Doxter will output to the console a preview of the parsed
+lines that belong to tagged regions, showing their ADoc processed version,
+together with extra lines added by the parser (eg. source code delimiters,
+blank lines, etc).</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. Doxter&#8217;s Base Markers</caption>
-<colgroup>
-<col style="width: 7%;">
-<col style="width: 23%;">
-<col style="width: 70%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>;=</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ADoc Header</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Marks beginning of doc Header. (first line only)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>;&gt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Region Begin</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Marks beginning of a tagged region.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>;|</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ADoc Comment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Treat line as AsciiDoc text.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>;~</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Skip Comment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The whole line will be ignored and skipped.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>;&lt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Region End</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Marks end of a tagged region.</p></td>
-</tr>
-</tbody>
-</table>
 <div class="paragraph">
-<p>SpiderBasic uses the same comments delimiter as PureBasic. As for Alan,
-just use its native comment delimiter (<code>--</code>) instead of <code>;</code>&#8201;&#8212;&#8201;i.e. <code>-&#8594;</code>,
-<code>--|</code>, <code>--~</code>, etc. The same applies to any other languages that will be
-supported in the future.</p>
+<p>Although the shown lines are just an aproximation of the final document (the
+regions will be postprocessed, merged and reoderdered before writing them to
+file), this feature is very useful to visually trace the source of problems
+when the ouput results are not as intendend, as the log provides a human
+friendly insight into Doxter&#8217;s parser.</p>
 </div>
-<div class="admonitionblock note">
+<div class="paragraph">
+<p>Here&#8217;s an example of how the console output looks like:</p>
+</div>
+<div class="listingblock shell">
+<div class="content">
+<pre>|0099|4100|   1|region tag, which would split the text in multiple paragraphs in the final <i class="conum" data-value="1"></i><b>(1)</b>
+|0100|4100|   1|document.
+|0101|4100|   1|// end::Comments_Marks[] <i class="conum" data-value="2"></i><b>(2)</b>
+|    |4100|   1| <i class="conum" data-value="3"></i><b>(3)</b>
+|0169|4101|  10|// tag::CLI_Usage[] <i class="conum" data-value="4"></i><b>(4)</b>
+|0170|4101|  10|=== Command Line Options</pre>
+</div>
+</div>
+<div class="colist arabic">
 <table>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>In PureBasic and SpiderBasic you can freely use the special comments marks
-(<code>;{</code>/<code>;}</code>/<code>;-</code>) within Doxter&#8217;s markers (e.g. <code>;{&gt;</code>, <code>;}~</code>, <code>;-|</code>, etc.)
-execpt in the ADoc Header marker, which can only be <code>;=</code>.
-This allows you to create regions which are foldable in PureBasic&#8217;s and
-SpiderBasic&#8217;s native IDEs.</p>
-</div>
-</td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Continuation lines of a region with weight <code>4100</code> and subweight <code>1</code>.</td>
 </tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The <strong>Tagged Region End</strong> marker has an alternative syntax to prevent Doxter
-from adding an empty line after closing the region:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. Region Markers Modifiers</caption>
-<colgroup>
-<col style="width: 7.5268%;">
-<col style="width: 21.5053%;">
-<col style="width: 70.9679%;">
-</colgroup>
-<tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>;&lt;&lt;</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Unspaced Region End</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Don&#8217;t add empty line after closing tag.</p></td>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>AsciiDoc tagged region <code>end::</code> generated by Doxter when it encountered
+a <code>;&lt;</code> marker.</td>
 </tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>This is useful when splitting a paragraph across multiple regions, in order to
-keep its text lines next to the code they belong to. Without the <code>&lt;</code> modifier,
-Doxter&#8217;s default behavior would be to add an empty line after the closing
-region tag, which would split the text in multiple paragraphs in the final
-document.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_doxter_parsers"><a class="anchor" href="#_doxter_parsers"></a>Doxter Parsers</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Understanding how Doxter&#8217;s parser works will help you grasp a clearer picture
-of how source files are processed, and gain insight into the proper use of
-its markers.</p>
-</div>
-<div class="paragraph">
-<p>Doxter uses a two-steps parsing approach when processing documents:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><strong>Header Parser</strong>&#8201;&#8212;&#8201;Scans the first lines of the source file looking for
-an AsciiDoc Header. Whether or not it found an Header, once finished
-its job the Header Parser relinquishes control over to the Regions Parser.</p>
-</li>
-<li>
-<p><strong>Regions Parser</strong>&#8201;&#8212;&#8201;Scans the reaminder of the source file looking for
-tagged regions to extract.</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>These are two different parsers altogether, and Doxter always runs the fed
-source file against both of them, in the exact order specified above.</p>
-</div>
-<div class="paragraph">
-<p>Each of these parsers obeys its own rules, and the way they interpret the
-comment markers (or ignore them) is slightly different.
-Here follow the simple rules by which each parser abides.</p>
-</div>
-<div class="sect2">
-<h3 id="_header_parser_rules"><a class="anchor" href="#_header_parser_rules"></a>Header Parser Rules</h3>
-<div class="paragraph">
-<p>The <strong>Header Parser</strong> has one single task, detect if the source contains an
-AsciiDoc Header and, if there is one, extract it and store it in memory.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Check if the very first line of the source file starts with <code>;=</code> (no
-leading space allowed):</p>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>No</strong>? Reset file pointer position to beginning of file and relinquish
-control to the Regions Parser. (Quit Parsing)</p>
-</li>
-<li>
-<p><strong>Yes</strong>? Then an AsciiDoc Header was found; strip away the <code>;</code> and store
-the line in the Header&#8217;s data storage, then:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>(<em>loop entrypoint</em>) Store current file position pointer and parse the
-next line:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>If an ADoc Comment line (<code>;|</code>) is found, strip it of the marker and
-add it to Header&#8217;s data storage, then carry on with parsing loop.</p>
-</li>
-<li>
-<p>If a Skip Comment line (<code>;~</code>) is found, ignore it and carry on with
-parsing loop.</p>
-</li>
-<li>
-<p>If the parsed line is none of the above, restore previous file position
-from stored pointer and relinquish control to the Regions Parser.
-(Exit Loop, Quit Parsing)</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_regions_parser_rules"><a class="anchor" href="#_regions_parser_rules"></a>Regions Parser Rules</h3>
-<div class="paragraph">
-<p>The task of the <strong>Regions Parser</strong> is to extract and process all lines that
-are enclosed between Region Start and Region End tags, and store them in
-memory.</p>
-</div>
-<div class="paragraph">
-<p>The <strong>Regions Parser</strong> alternates between two mutually exclusive modalities:
-<em>Seeking</em>, and <em>InsideRegion</em>.</p>
-</div>
-<div class="paragraph">
-<p>When in <em>Seeking</em> modality, the parser will scan every source line until it
-finds a line whose first non-whitespace characters are a Region Begin marker
-(<code>;&gt;</code> or <code>;{&gt;</code>), and it will ignore anything else. Once it finds the Region
-Begin marker the parser switches to the <em>InsideRegion</em> modality.</p>
-</div>
-<div class="paragraph">
-<p>When in <em>InsideRegion</em> modality, the parser behavior changes, as every line
-which has not a Skip Comment marker (<code>;~</code>) will be processed and become part
-of the output document, until it find a Region End marker (<code>;&lt;</code> and variants),
-in which case it reverts to <em>Seeking</em> modality, and so on, until the end of
-file is reached.</p>
-</div>
-<div class="paragraph">
-<p>Furthermore, in <em>InsideRegion</em> modality the parser can be enter and exit the
-<em>InsideCode</em> state. This is used to track inclusion of source code lines in
-the region, as opposed to ADoc comment lines, for in the final document
-source code must be enclosed in an AsciiDoc source block, using source
-delimiters and setting the syntax to PureBasic. This will ensure that code
-is shown as a verbatim block and enable syntax highlighting (if supported).</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>(<strong>Seeking Modality</strong>) this is the modality the parser starts off in:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>(<em>loop entrypoint</em>) Parse line and check if its first non-white space
-characters are a Region Begin Tag (<code>;&gt;</code>):</p>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>No</strong>? Ignore line and carry on with parsing parsing loop in Seeking mode.</p>
-</li>
-<li>
-<p><strong>Yes</strong>?</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Process line and extract <em>tag</em>, <em>weight</em> and <em>subweight</em> (if present):</p>
-<div class="ulist">
-<ul>
-<li>
-<p>if no <em>tag</em> was provided, use default fallback Id instead: <code>region</code>
-followed by a counter that increases at each use (e.g. <code>region1</code>,
-<code>region2</code>, etc.).</p>
-</li>
-<li>
-<p>if no <em>weight</em> was provided:
-<strong><strong></strong></strong> if a region with same <em>tag</em> already exists in memory, retrive its
-       weight and use it, otherwise assign the last used weigth incremented
-       by one (assume that the users wishes the new region to be continguos
-       with the preceding one).</p>
-</li>
-<li>
-<p>if no <em>subweight</em> was provided:
-<strong><strong></strong></strong> if a region with same <em>tag</em> already exists in memory, retrive its
-       last used subweight, increase by 1 and use it, otherwise use value 1.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Create new entry in memory for this region fragment and store its weight
-and subweight values.</p>
-</li>
-<li>
-<p>Enter <em>InsideRegion</em> modality (Switch Loop).</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>(<strong>InsideRegion Modality</strong>):</p>
-<div class="ulist">
-<ul>
-<li>
-<p>(<em>loop entrypoint</em>) Parse line and check if its first non-white space
-characters are one of Doxter markers or not:</p>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>No</strong>? Then the user wants to include source code lines in the region:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Set parser&#8217;s state to <em>InsideCode</em>.</p>
-</li>
-<li>
-<p>Add to current region&#8217;s stored data a blank line followed by AsciiDoc
-markup to open a source block (<code>[source,purebasic]</code>) followed by a line
-with source block delimiter (<code>---</code>, 80 chars long).</p>
-</li>
-<li>
-<p>Add parsed line to current region&#8217;s data, as is.</p>
-</li>
-<li>
-<p>Carry on parsing loop in InsideRegion modality.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><strong>Yes</strong>? Depending on the found marker:</p>
-<div class="ulist">
-<ul>
-<li>
-<p>It&#8217;s an ADoc Comment marker (<code>;|</code>):</p>
-<div class="ulist">
-<ul>
-<li>
-<p>If parser is in <em>InsideCode</em> state, add to current region&#8217;s stored data
-an AsciiDoc line containing a source delimiter to end source code
-block, followed by a blank line. Carry on parsing loop.</p>
-</li>
-<li>
-<p>Strip marker away (together with following space character, if present)
-and add line to current region&#8217;s data storage in memory.</p>
-</li>
-<li>
-<p>Carry on parsing loop in InsideRegion modality.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>It&#8217;s a Skip Comment marker (<code>;~</code>):</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Ignore line and carry on parsing loop in InsideRegion modality.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>It&#8217;s a Region End marker (<code>;&lt;</code>):</p>
-<div class="ulist">
-<ul>
-<li>
-<p>If parser is in <em>InsideCode</em> state, add to current region&#8217;s stored data
-an AsciiDoc line containing a source delimiter to end source code
-block, followed by a blank line. Carry on parsing loop.</p>
-</li>
-<li>
-<p>Check if the Region End marker contais the <code>&lt;</code> modifier (<code>;&lt;&lt;</code>);
-if not, add a blank line to current region, otherwise not.</p>
-</li>
-<li>
-<p>Revert to <em>Seeking</em> modality (Switch Loop).</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-<div class="admonitionblock note">
-<table>
 <tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>During the parsing stage no AsciiDoc tagged region begin/end lines are added
-to the regions stored in memory, because regions with same tag still need
-to be sorted and merged together (the parser stores each region fragment
-separately, regardless of its tag).
-It will be the postprocessor&#8217;s job to handle all that, and once fragmented
-regions are merged together the AsciiDoc <code>// tag:[]</code> and <code>// end:[]</code> lines
-will be added at their start and end, respectively.</p>
-</div>
-<div class="paragraph">
-<p>The AsciiDoc <code>// tag:[]</code> and <code>// end:[]</code> lines shown in the Live Preview
-are just for debugging purposes, so to speak, but they are not actually
-stored in memory at that point.</p>
-</div>
-</td>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Blank line added by Doxter; note that there is no corresponing line
+number, for it is not found in the source file.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Region Being marker found ad line 169, with wieght <code>4101</code> and sebweight
+<code>10</code> (probably the continuation of a fragmented region).</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>The above rules are going to be a useful reference when you&#8217;ve began learning
-Doxter, and by studying them you can get the full picture of its inner workings.
-But studying Doxter&#8217;s main documentation and examples is a better starting
-point if you&#8217;re new to Doxter&#8201;&#8212;&#8201;also, don&#8217;t forget to look at source code of
-Doxter, for it&#8217;s self-documenting by its own system, and you can compare the
-source to the AsciiDoc output and study it, if you like to learn by examples.</p>
+<p>There are four columns in the preview, representing the line number in the
+source file, the region&#8217;s weight, its subweight, and a preview of the line
+converted to AsciiDoc.</p>
 </div>
+<div class="paragraph">
+<p>The absence of line number in the first column indicates that what you are
+seeing on the right hand side is a line generated by Doxter, and added to
+the output document for formatting purposes (e.g. a blank line, source code
+block delimiters, etc.).</p>
+</div>
+<div class="paragraph">
+<p>The weight colum is very useful when looking at the logged output for it
+allows to easily spot where regions start and end, as each region should
+have a different weight (although not mandatory).
+Header lines will always show the text <code>head</code> in the second and third
+columns, instead of numbers, because the Header has no weight or subweight.</p>
 </div>
 </div>
 </div>
@@ -969,88 +675,196 @@ SOFTWARE.</p>
 <div class="sect1">
 <h2 id="_changelog"><a class="anchor" href="#_changelog"></a>CHANGELOG</h2>
 <div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="_doxter_changelog"><a class="anchor" href="#_doxter_changelog"></a>Doxter Changelog</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Changelog of Doxter engine module.</p>
+<p>Changelog of Doxter command line application.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>v0.0.5-alpha</strong> (2018/11/29)&#8201;&#8212;&#8201;Documentation outsourcing:
+<p><strong>v0.2.5-alpha</strong> (2018/11/29)&#8201;&#8212;&#8201;Documentation outsourcing:
 Move to external AsciiDoc files the documentation regions that are not strictly
-commenting the Engine and its API.</p>
+commenting parts of the source code:</p>
 <div class="ulist">
 <ul>
 <li>
 <p>Move <code>CHANGELOG</code> region to <code>CHANGELOG.adoc</code>.</p>
 </li>
+<li>
+<p>Move to <code>README.adoc</code> the following commented regions:
+<code>Acknowledgements</code>, <code>Roadmap</code>.</p>
+</li>
 </ul>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The goal is to keep the source files shorter and that doxtering each source module
+will produce a reference document strictly focusing on the module technicalities.</p>
+</div>
+<div class="paragraph">
+<p>From now on, Doxter documentation will be handled in external AsciiDoc files that
+will then import from the doxterized sources the relevant tagged regions.
+Since the documentation is starting to grow larger, this approach is more flexible
+and allows reusing the same regions contents in multiple documents.</p>
+</div>
+</div>
 </div>
 </li>
 <li>
-<p><strong>v0.0.4-alpha</strong> (2018/11/25)&#8201;&#8212;&#8201;Engine optimizations:</p>
+<p><strong>v0.2.4-alpha</strong> (2018/11/25)&#8201;&#8212;&#8201;Engine optimizations:</p>
 <div class="ulist">
 <ul>
 <li>
 <p>The engine code has been slightly optimized to improve performance and
-code maintainability:</p>
+code maintainability.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>v0.2.3-alpha</strong> (2018/10/11)&#8201;&#8212;&#8201;BUG FIX:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Reduced the number of RegExs used by the engine by optimizing reusability.</p>
+<p>Read Alan sources as ISO-8859-1. Add <code>dox::fileEnconding</code> var to allow
+setting file read operations for Alan sources to Ascii and avoid breaking
+special characters that were being read as if encoded in UTF-8.</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
-<p>Source lines parsing has been optimized in both the Header Parser and the
-Regions Parser.</p>
-</li>
-<li>
-<p>Deleted internal procedures:</p>
+<p><strong>v0.2.2-alpha</strong> (2018/10/11)&#8201;&#8212;&#8201;BUG FIX:</p>
 <div class="ulist">
 <ul>
 <li>
-<p><code>IsAdocComment()</code></p>
-</li>
-<li>
-<p><code>IsSkipComment()</code></p>
-</li>
-<li>
-<p><code>StripCommentLine()</code></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
+<p>Corrupted filenames. A bug was corrupting output filenames of Alan source
+files with <code>.i</code> extension. Now fixed.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><strong>v0.0.3-alpha</strong> (2018/10/11)&#8201;&#8212;&#8201;BUG FIX: Read Alan sources as ISO-8859-1:</p>
+<p><strong>v0.2.1-alpha</strong> (2018/10/10)&#8201;&#8212;&#8201;Add Alan IF support.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Add <code>fileEnconding</code> var to allow setting file read operations for Alan
-sources to Ascii (<code>#PB_Ascii</code>) to avoid breaking special characters that
-were being read as if encoded in UTF-8.</p>
-</li>
-</ul>
-</div>
+<p>Now Doxter will detect from the input file&#8217;s extension whether it&#8217;s a
+PureBasic, SpiderBasic or Alan IF source file, and set the comment delimiter
+and base language (to use in ADoc source blocks) accordingly.</p>
 </li>
 <li>
-<p><strong>v0.0.2-alpha</strong> (2018/10/10)&#8201;&#8212;&#8201;Add support for Alan language, and improve
-SpiderBasic support:</p>
+<p>The supported extensions, and associated languages now are:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>The Engine now exposes a <code>dox::SetEngineLang(lang.s)</code> procedure to allow
-setting the comment delimiter and the language of source blocks according
-to the selected language (<code>"PureBasic"</code>, <code>"SpiderBasic"</code> or <code>"Alan"</code>).</p>
+<p><code>pb</code>, <code>pbi</code>, <code>pbf</code> &#8594; PureBasic</p>
+</li>
+<li>
+<p><code>sb</code>, <code>sbi</code>, <code>sbf</code> &#8594; SpiderBasic</p>
+</li>
+<li>
+<p><code>alan</code>, <code>i</code>        &#8594; Alan</p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><strong>v0.0.1-alpha</strong> (2018/10/03)&#8201;&#8212;&#8201;First module engine release.</p>
+<p><strong>v0.2.0-alpha</strong> (2018/10/03)&#8201;&#8212;&#8201;Move Doxter Engine to separate module:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Now the core engine of Doxter is in a separate module, so that it will be
+usable by other applications too (still needs some fixes to be usable in
+non-console applications).</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>v0.1.4-alpha</strong> (2018/10/01)&#8201;&#8212;&#8201;Documentation:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>AsciiDoc examples now syntax highlighted.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>v0.1.3-alpha</strong> (2018/09/29)&#8201;&#8212;&#8201;Doxter engine improved:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>PureBasic special comments markers (<code>;{</code>, <code>;}</code> and <code>;-</code>) can now be used
+in all Doxter markers, except ADoc Header (<code>;=</code>).</p>
+</li>
+<li>
+<p>Regions merging feature introduced:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Tagged regions with same tag identifier are merged into a single region
+in the output document:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>All region fragments will be sorted by subweight before merging.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Region subweight:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>New subweight parameter (optional) introduced in Region Begin marker,
+(e.g. <code>;&gt;tag(100.99</code>)` or <code>;&gt;(.99)</code>, where subweight is <code>99</code>).</p>
+</li>
+<li>
+<p>If the marker doesn&#8217;t provide a subweight, the last subweight value used
+with that tag will be automatically employed after incrementing it by 1.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>When a weightless Region Begin marker is encountered, if a region with
+the same tag already exists, that region&#8217;s weight will be used for the
+new region fragment, otherwise it will be given weight 1.</p>
+</li>
+<li>
+<p>If multiple weight definitions are given for a same region tag, the last
+one encountered will override the previous ones.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Parsing Live Preview now shows subweight in new third column.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><strong>v0.1.2-alpha</strong> (2018/09/25)&#8201;&#8212;&#8201;Aesthetic changes.</p>
+</li>
+<li>
+<p><strong>v0.1.1-alpha</strong> (2018/09/25)&#8201;&#8212;&#8201;Created Doxter repository on GitHub.</p>
+</li>
+<li>
+<p><strong>v0.1.0-alpha</strong> (2018/09/21)&#8201;&#8212;&#8201;First public released Alpha:
+<a href="https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb" target="_blank" rel="noopener">https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb</a></p>
 </li>
 </ul>
 </div>
@@ -1059,7 +873,7 @@ to the selected language (<code>"PureBasic"</code>, <code>"SpiderBasic"</code> o
 </div>
 <div id="footer">
 <div id="footer-text">
-Doxter Engine 0.0.5-alpha<br>
+Doxter 0.2.5-alpha<br>
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">

@@ -1,0 +1,433 @@
+= Doxter: A Docs from Sources Generator.
+Tristano Ajmone, <tajmone@gmail.com>
+include::doxter.asciidoc[lines=3]
+// TOC Settings:
+:toc: left
+:toclevels: 5
+// Sections Numbering:
+:sectnums!:
+:sectnumlevels: 2
+// Cross References:
+:xrefstyle: short
+:section-refsig: Sect.
+// Misc Settings:
+:experimental: true
+:icons: font
+:linkattrs: true
+:reproducible: true
+:sectanchors:
+:version-label: Doxter
+
+// =====================================
+// Custom Attributes for Reference Links
+// =====================================
+:DoxterLogo: doxter_logo.svg
+:api-docs: doxter_engine.asciidoc
+:AsciiDoc_Header: <<AsciiDoc Header>>
+
+// *****************************************************************************
+// *                                                                           *
+// *                            Document Preamble                              *
+// *                                                                           *
+// *****************************************************************************
+
+
+================================================================================
+include::../README.adoc[tag=DoxterLogo]
+include::../README.adoc[tag=welcome]
+================================================================================
+
+
+== About Doxter
+
+Doxter was conceived as a practical solution to simplify management of source code documentation.
+Specifically, its birth and growth are tied to the https://github.com/tajmone/PBCodeArcProto[development of prototype tools^] for the https://github.com/SicroAtGit/PureBasic-CodeArchiv-Rebirth[PureBasic-CodeArchiv-Rebirth^] project, which has challenged me in keeping the documentation of multiple modules always up to date with their current code.
+
+Working on separate documentation and source code files is both tiring and a cause of redundancy -- you'll need to include some documentation in the source file comments, and you also need to include some code excerpts in the documentation.
+Why duplicate the effort when you can keep it all in one place?
+
+Code generators are not a new idea (and surely, not my original idea either); there are plenty of code generator tools and frameworks out there, but most of them are not language agnostic, don't integrate well with PureBasic, or require a complex setup envolving lots of dependencies.
+
+Doxter was originally designed to work with PureBasic, leveraging the power of AsciiDoc and with simplicity in mind.
+It now supports SpiderBasic and Alan IF sources too and, ultimately, it will be become a language agnostic tool usable with almost any language.
+
+
+
+=== Who Needs Doxter?
+
+Any PureBasic or SpiderBasic programmer who knows AsciiDoc and wants to include documentation of his/her code directly in the source files can benefit from Doxter by automating the task of producing always up-to-date documentation in various formats (HTML5, man pages, PDF, and any other output format supported by Asciidoctor backends).
+
+// ==============================================================================
+//                                ACKNOWLEDGEMENTS
+// ==============================================================================
+include::../README.adoc[tag=Acknowledgements,leveloffset=1]
+
+
+=== Doxter Engine
+
+At the core of the command line Doxter tool lies the Doxter Engine, which is available as an independent module that can be used other applications too.
+
+For more information see the
+<<{api-docs}#,_Doxter Engine API Documentation_>>.
+
+
+== Features
+
+Doxter is a command line tool that parses a source file and extracts from it tag-delimited regions of code, these regions are then processed according to some very simple rules in order to produce a well formed AsciiDoc source document which can then be converted to HTML via Asciidoctor (Ruby).
+
+=== Cross Documents Selective Inclusions
+
+Every tagged region in the source file becomes an AsciiDoc tagged region in the output document.
+The following PureBasic source comments contain a simple Doxter region:
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>
+;| I'm a Doxter _region_.
+;<
+-----------------------------------------------------------------------------
+
+\... which, in the final document, Doxter will render as AsciiDoc:
+
+[source,asciidoc]
+-----------------------------------------------------------------------------
+// tag::region1[]
+I'm a Doxter _region_.
+
+// end::region1[]
+-----------------------------------------------------------------------------
+
+
+Regions can be named in the source file, by providing an identifier after the `;>` marker, allowing you to control regions' tag names in the AsciiDoc output:
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>intro
+;| == Introduction
+;|
+;| This a _named_ region.
+;<
+-----------------------------------------------------------------------------
+
+[source,asciidoc]
+-----------------------------------------------------------------------------
+// tag::intro[]
+== Introduction
+
+This a _named_ region.
+
+// end::intro[]
+-----------------------------------------------------------------------------
+
+
+This is a very practical feature for it allows other AsciiDoc documents to selectively include parts of a source file documentation using tag filtering.
+
+For example, when documenting an application that relies on imported Modules, the main document can selectively include regions from the Doxter-generated modules' documentation, thus allowing to maintain both independent documentation for every Module API, as well as having a main document that extrapolates parts from the modules' docs in a self-updating fashion.
+
+=== _Ordo ab Chao_: Structured Docs from Scattered Comments
+
+Each tagged region in the source file can be assigned a weight, so that in the final document the regions will be reordered in a specific way, forming a well structured document that presents contents in the right order.
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>sec1(200)
+;| == Section One
+;|
+;| And this is Sec 1.
+;<
+For i= 1 To 10
+  Debug "i = " + Str(i)
+Next
+;>premise(100)
+;| == Premise
+;|
+;| This is an opening premise.
+;<
+-----------------------------------------------------------------------------
+
+[source,asciidoc]
+-----------------------------------------------------------------------------
+// tag::premise[]
+== Premise
+
+This is an opening premise.
+
+// end::premise[]
+// tag::sec1[]
+== Section One
+
+And this is Sec 1.
+
+// end::sec1[]
+-----------------------------------------------------------------------------
+
+
+This feature allows to keep each paragraph near the code lines that it discusses, making the source code more readable and freeing the documentation from the constraints imposed by the order in which the code is organized.
+
+
+Furthermore, regions with same tag names in the source code will be merged into a single region in the final document.
+Each region fragment (aka subregion) can be assigned a subweight which will be used to sort the order of the fragments before merging them together.
+This allows you to control the number of regions in the final document, and keep related topics under a same region.
+
+In the following example:
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>even_macro_intro(.2)
+;| The following macro performs a bitwise AND operation to determine if an
+;| integer is even or not.
+Macro IsEven(num)
+  (num & 1 = 0)
+EndMacro
+;<
+
+;>macro_test(200)
+;| Let's test that the macro actually works as expected.
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+;<
+
+;>even_macro_intro(100.1)
+;| === The IsEven Macro
+;|
+;| Using bitwise operations insted of modulo (`%`) is much _much_ faster -- in
+;| the order of hundreds of times faster!
+;<
+;>even_macro_intro(.3)
+;| This works because `IsEven = ((i % 2) = 0)` equals `IsEven = ((i & 1) = 0)`.
+;<
+-----------------------------------------------------------------------------
+
+\... all the regions named `even_macro_intro` are merged into a single region after being sorted according to ther subeweights (`.1`, `.2` and `.3`):
+
+[source,asciidoc]
+-----------------------------------------------------------------------------
+// tag::even_macro_intro[]
+=== The IsEven Macro
+
+Using bitwise operations insted of modulo (`%`) is much _much_ faster -- in
+the order of hundreds of times faster!
+
+The following macro performs a bitwise AND operation to determine if an
+integer is even or not.
+
+[source,purebasic]
+--------------------------------------------------------------------------------
+Macro IsEven(num)
+  (num & 1 = 0)
+EndMacro
+--------------------------------------------------------------------------------
+
+
+This works because `IsEven = ((i % 2) = 0)` equals `IsEven = ((i & 1) = 0)`.
+
+// end::even_macro_intro[]
+// tag::macro_test[]
+Let's test that the macro actually works as expected.
+
+[source,purebasic]
+--------------------------------------------------------------------------------
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+--------------------------------------------------------------------------------
+
+
+// end::macro_test[]
+-----------------------------------------------------------------------------
+
+
+Keep your comments next to the code they belong to, allowing the source file to follow its natural course and provide meaningful snippets of in-code documentation, and use weighed tag regions to ensure that these out-of-order fragments will be collated in a meaningful progressive order in the output document.
+
+=== Mix Text and Source Code in Your Documentation
+
+
+Regions can contain both of AsciiDoc comments markers and source code, allowing to include fragments of the original source code in the final documentation, along with AsciiDoc text.
+
+
+
+AsciiDoc markers are comment lines with special symbols after the native language comment delimiters, which will be treated as normal comments by the source language, but which Doxter will strip of the comment delimiter and turn into AsciiDoc lines in the output document.
+
+
+Any source code (i.e. non-AsciiDoc comments) inside a tagged region will be rendered in the final document as an AsciiDoc source code block set to the source language (e.g. PureBasic).
+
+[source,purebasic]
+-----------------------------------------------------------------------------
+;>macro_test(200)
+;| Let's test that the macro actually works as expected.
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+;<
+-----------------------------------------------------------------------------
+
+
+[source,asciidoc]
+-----------------------------------------------------------------------------
+// tag::macro_test[]
+Let's test that the macro actually works as expected.
+
+[source,purebasic]
+--------------------------------------------------------------------------------
+For i = 1 To 5
+  If isEven(i)
+    Debug Str(i) +" is even."
+  Else
+    Debug Str(i) +" is odd."
+  EndIf
+Next
+--------------------------------------------------------------------------------
+
+
+// end::macro_test[]
+-----------------------------------------------------------------------------
+
+// Command Line Options
+
+include::doxter.asciidoc[tag=CLI_Usage,leveloffset=+1]
+
+// ==============================================================================
+//                                   CLI USAGE
+// ==============================================================================
+
+== Command Line Usage
+
+Doxter is a binary console application (a compiled executable).
+There is no installation, just place the binary file (`Doxter.exe` on Windows) in your working folder, or make it availabe system-wide by adding it to the system `PATH` environment variable.
+
+include::doxter.asciidoc[tags=Input_File_Validation;Output_File,leveloffset=+1]
+include::doxter_engine.asciidoc[tag=Parser_Live_Preview,leveloffset=+1]
+
+// ==============================================================================
+//                               DOCUMENTING SOURCE
+// ==============================================================================
+
+== Documenting Your Source Files
+
+Now comes the juicy part, how to incorporate documentation into you source files.
+The good news is that the system employed by Doxter is very easy to learn and simple to use.
+
+include::doxter_engine.asciidoc[tag=Comments_Marks,leveloffset=+1]
+
+That's about all you'll have to learn: memorize those five base symbols, their variants and modifiers, and learn how to use them correctly and wisely.
+
+Doxter is a "`dumb`" tool -- it doesn't try to interpret or validate what comes after these markers, it just uses them to delimit and manipulate lines from your source file according to some simple predefined rules.
+It's your responsibility to ensure that the contents of the tagged regions are AsciiDoc compliant.
+
+But as you shall see, these five simple markers empower you with great freedom to document your source code.
+Thanks to some simple rules devised on common sense expectations of how text and source code should blend in documentation, Doxter will parse smartly your source files, with little effort on your side.
+
+
+=== Doxter's Parser
+
+Understanding how Doxter's parser works will help you grasp a clearer picture
+of how source files are processed, and gain insight into the proper use of
+its markers.
+You can read a full dscription of the parser's workflow in the
+<<doxter_engine#_doxter_parsers,__Doxter Parsers__ section>> of Doxter Engine's
+documentation.
+For the time being, you should just bare in mind a couple of things.
+
+include::doxter_engine.asciidoc[tag=two_steps_parsing]
+
+Each of these parsers obeys its own rules, and the way they interpret the
+comment markers (or ignore them) is slightly different.
+What you should keep in mind is that the two parsers are independent from
+each other, and so are their rules.
+
+
+=== AsciiDoc Header
+
+The very first line in your source code is special for Doxter.
+The Header Parser will look if it starts with a `;=`.
+This marker is the telltale sign for Doxter that the first lines contain an AsciiDoc Header.
+Here's an example from the very source of Doxter:
+
+[source,purebasic]
+----------------------------------
+include::../doxter.pb[lines=1..13]
+----------------------------------
+
+As you can easily guess by looking at the first 4 lines in the above code, these represent a standard AsciiDoc Header, followed by a custom attribute (`:License: MIT License`), a Skip line (ignored by Doxter) used as horizontal ruler divider, and some more Asciidoctor settings attributes (`:version-label:` and `:toclevels:`).
+
+Everything is as it would be in a normal AsciiDoc Header, except that the Header lines are inside PureBasic comments.
+The remaining lines are just normal (non-Doxter) PB code and comments.
+
+When Doxter encounters a `;=` on the very first line, it will then parse all consecutive lines starging by `;|` (the ADoc comment marker) as part of the Header, adding it to the stored Header data.
+Lines starting with `{tilde}|` (the Skip comment marker) are simply ignored, and they are not considered as the end of a Header.
+As soon as line not starting by `;|` or `{tilde}|` is encountered, Doxter will stop parsing the Header.
+
+Separate handling of the Header is important for two reasons:
+
+1. Documents which don't contain an AsciiDoc Header will not be treated as
+   standalone documents (and saved with `.adoc` extension).
+2. The Header lines must always be injected at the very beginning of the
+   output file, before any of the tagged regions extracted from the source
+   file (and regardless of their weights).
+
+The latter point is important because it's in compliance with how AsciiDoc looks for a Header in source files.
+
+Whether or not Doxter found and Header in the source file, once it has dealt with it it will carry on to the next parsing stage: scanning the source for tagged regions.
+The Header and Regions parsers are two distinct parsers that coexist in Doxter, and the latter takes on where the former left.
+
+[NOTE]
+========================
+The Header parser doesn't consume those lines that didn't match its criteria, and as soon as it encounters a non Header line it rolls back the parser to the last file position, so that the regions parser can parse them instead.
+========================
+
+
+=== Working With Regions
+
+The full syntax of a Tag Region Begin mark is:
+
+--------------------------
+;>tagname(<region weight>.<region subweight>)
+--------------------------
+
+// include::doxter.asciidoc[tag=Working_With_Regions]
+
+
+== To Be Continued...
+
+[WARNING]
+========================
+The documentation is not complete yet, as it lacks the part on practical examples.
+
+The provided documentation should be enough to get started using Doxter; for examples, study its source code in the mean time, and _use it_, _use it_, and _use it again_, for it's easier to use than it might seem by reading its documentation.
+
+Also, by using it you can benefit from the <<Parsing Live Preview During Execution,live parsing preview log>>, which is an invaluable tool for learning.
+========================
+
+// ==============================================================================
+//                                    ROADMAP
+// ==============================================================================
+include::../README.adoc[tag=Roadmap]
+
+
+// ==============================================================================
+//                                    LICENSE
+// ==============================================================================
+
+== License
+
+include::../README.adoc[tag=LICENSE]
+
+// ==============================================================================
+//                                   CHANGELOG
+// ==============================================================================
+include::../CHANGELOG.adoc[tag=DoxterCHANGELOG]
+
+// EOF //

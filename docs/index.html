@@ -437,9 +437,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Doxter: A Docs from Sources Generator.</h1>
 <div class="details">
 <span id="author" class="author">Tristano Ajmone, &lt;tajmone@gmail.com&gt;</span><br>
-<span id="revnumber">version 0.2.4-alpha,</span>
-<span id="revdate">Novermber 25, 2018</span>
-<br><span id="revremark">Public Alpha</span>
+<span id="revnumber">doxter 0.2.5-alpha,</span>
+<span id="revdate">2018-11-29</span>
+<br><span id="revremark">PureBASIC 5.62</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -447,8 +447,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_about_doxter">About Doxter</a>
 <ul class="sectlevel2">
 <li><a href="#_who_needs_doxter">Who Needs Doxter?</a></li>
-<li><a href="#_doxters_engine">Doxter&#8217;s Engine</a></li>
 <li><a href="#_acknowledgements">Acknowledgements</a></li>
+<li><a href="#_doxter_engine">Doxter Engine</a></li>
 </ul>
 </li>
 <li><a href="#_features">Features</a>
@@ -474,9 +474,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </li>
 <li><a href="#_to_be_continued">To Be Continued&#8230;&#8203;</a></li>
-<li><a href="#_license">License</a></li>
 <li><a href="#_roadmap">Roadmap</a></li>
-<li><a href="#_changelog">Changelog</a></li>
+<li><a href="#_license">License</a></li>
+<li><a href="#_doxter_changelog">Doxter Changelog</a></li>
 </ul>
 </div>
 </div>
@@ -487,19 +487,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <div class="imageblock" style="text-align: center">
 <div class="content">
-<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgeG1sbnM6ZGM9Imh0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvIgogICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIgogICB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgd2lkdGg9IjEzMi4yOTE2N21tIgogICBoZWlnaHQ9IjQ4Ljg2ODY5bW0iCiAgIHZlcnNpb249IjEuMSIKICAgdmlld0JveD0iMCAwIDEwMCA4My42MjYwMzYiCiAgIGlkPSJzdmcxOSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iRE9YVEVSIExvZ28gLSBvcHRpbWl6ZWQuc3ZnIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkyLjMgKDI0MDU1NDYsIDIwMTgtMDMtMTEpIgogICBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3Ij4KICA8dGl0bGUKICAgICBpZD0idGl0bGU0NTMzIj5ET1hURVIgTG9nbzwvdGl0bGU+CiAgPG1ldGFkYXRhCiAgICAgaWQ9Im1ldGFkYXRhMjMiPgogICAgPHJkZjpSREY+CiAgICAgIDxjYzpXb3JrCiAgICAgICAgIHJkZjphYm91dD0iIj4KICAgICAgICA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4KICAgICAgICA8ZGM6dHlwZQogICAgICAgICAgIHJkZjpyZXNvdXJjZT0iaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL1N0aWxsSW1hZ2UiIC8+CiAgICAgICAgPGRjOnRpdGxlPkRPWFRFUiBMb2dvPC9kYzp0aXRsZT4KICAgICAgPC9jYzpXb3JrPgogICAgPC9yZGY6UkRGPgogIDwvbWV0YWRhdGE+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzY2NjY2NiIKICAgICBib3JkZXJvcGFjaXR5PSIxIgogICAgIG9iamVjdHRvbGVyYW5jZT0iMTAiCiAgICAgZ3JpZHRvbGVyYW5jZT0iMTAiCiAgICAgZ3VpZGV0b2xlcmFuY2U9IjEwIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwIgogICAgIGlua3NjYXBlOnBhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6d2luZG93LXdpZHRoPSIxOTIwIgogICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9IjEwMTciCiAgICAgaWQ9Im5hbWVkdmlldzIxIgogICAgIHNob3dncmlkPSJmYWxzZSIKICAgICBpbmtzY2FwZTp6b29tPSIwLjU5NDY1MjIiCiAgICAgaW5rc2NhcGU6Y3g9Ii0yMTcuMzE1NzMiCiAgICAgaW5rc2NhcGU6Y3k9Ii0xNDEuMzQ1MzMiCiAgICAgaW5rc2NhcGU6d2luZG93LXg9Ii04IgogICAgIGlua3NjYXBlOndpbmRvdy15PSItOCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzE5IiAvPgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxMyI+CiAgICA8ZmlsdGVyCiAgICAgICBpZD0iZmlsdGVyNjU1OCIKICAgICAgIHN0eWxlPSJjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM6c1JHQiI+CiAgICAgIDxmZUZsb29kCiAgICAgICAgIGZsb29kLWNvbG9yPSJyZ2IoMCwwLDApIgogICAgICAgICBmbG9vZC1vcGFjaXR5PSIuNDk4MDQiCiAgICAgICAgIHJlc3VsdD0iZmxvb2QiCiAgICAgICAgIGlkPSJmZUZsb29kMiIgLz4KICAgICAgPGZlQ29tcG9zaXRlCiAgICAgICAgIGluPSJmbG9vZCIKICAgICAgICAgaW4yPSJTb3VyY2VHcmFwaGljIgogICAgICAgICBvcGVyYXRvcj0iaW4iCiAgICAgICAgIHJlc3VsdD0iY29tcG9zaXRlMSIKICAgICAgICAgaWQ9ImZlQ29tcG9zaXRlNCIgLz4KICAgICAgPGZlR2F1c3NpYW5CbHVyCiAgICAgICAgIGluPSJjb21wb3NpdGUxIgogICAgICAgICByZXN1bHQ9ImJsdXIiCiAgICAgICAgIHN0ZERldmlhdGlvbj0iMyIKICAgICAgICAgaWQ9ImZlR2F1c3NpYW5CbHVyNiIgLz4KICAgICAgPGZlT2Zmc2V0CiAgICAgICAgIGR4PSI2IgogICAgICAgICBkeT0iNiIKICAgICAgICAgcmVzdWx0PSJvZmZzZXQiCiAgICAgICAgIGlkPSJmZU9mZnNldDgiIC8+CiAgICAgIDxmZUNvbXBvc2l0ZQogICAgICAgICBpbj0iU291cmNlR3JhcGhpYyIKICAgICAgICAgaW4yPSJvZmZzZXQiCiAgICAgICAgIHJlc3VsdD0iY29tcG9zaXRlMiIKICAgICAgICAgaWQ9ImZlQ29tcG9zaXRlMTAiIC8+CiAgICA8L2ZpbHRlcj4KICA8L2RlZnM+CiAgPGcKICAgICB0cmFuc2Zvcm09Im1hdHJpeCgwLjM3ODYyNTAzLDAsMCwwLjM3ODYyNTAzLC02NS44OTQ3NjgsLTc0LjkxMjYxMykiCiAgICAgYXJpYS1sYWJlbD0iRE9YVEVSIgogICAgIGlkPSJnMTciPgogICAgPHBhdGgKICAgICAgIGQ9Im0gMjI3LjAzLDIxNi4yNiBjIC0zLjY4MTEsMCAtNS4wNDg3LDIuMzAwNyAtMy45NzM4LDUuNTIxNyBsIDI2Ljk0LDg0LjY2NiAtNDQuNzMxLDg4LjM0NyBjIC0xLjY4NTksMy4yMjEgLTAuNzUyMzcsNS41MjE3IDIuOTI4OCw1LjUyMTcgaCAyMy42OTYgYyAyLjUzMDgsMCA0LjQ1OTksLTAuOTE5NTUgNS41OTg0LC0zLjIyMDMgbCAyNy4zNjYsLTU1LjY3NyAxNi44MDcsNTUuNjc3IGMgMC43MDIwOCwyLjMwMDcgMi40NTM5LDMuMjIwMyA0Ljk4NDcsMy4yMjAzIGggMjMuNjk4IGMgMy42ODExLDAgNS4wNTA0LC0yLjMwMDcgMy45NzU1LC01LjUyMTcgbCAtMTQuODQ4LC00Ni41MTIgYyAwLjA3OTksLTAuMDQzMSAwLjE1MTQ5LC0wLjA3NzcgMC4yMzUyNiwtMC4xMjQ0NSAxLjc5MDgsLTAuOTk5ODYgMy41NTc0LC0zLjA5MDQgMy44MTAxLC00LjUxMDggMC40Njk5NiwtMi42NDEyIC0yLjAwNTgsLTUuODUzMiAtNS4wMzQxLC02LjUzMDkgLTAuNjg0NywtMC4xNTMyNCAtMS4xMzg4LC0wLjIxNTI5IC0xLjU5NzQsLTAuMTU4NTUgLTAuMjg1NzksMC4wMzU0IC0wLjU5NjA0LDAuMTM3NjIgLTAuOTQxMDIsMC4yNzI3NiBsIC05LjgyNjIsLTMwLjc4MyA0My4yMzEsLTg0LjY2NiBjIDEuNjg1OSwtMy4yMjEgMC43NTIzNSwtNS41MjE3IC0yLjkyODgsLTUuNTIxNyBoIC0yMy4wMDYgYyAtMi41MzA4LDAgLTQuNDU5OSwwLjkyMTI2IC01LjU5ODQsMy4yMjIgbCAtMjYuNTY3LDU0LjUyNiAtMTYuMjI2LC01NC41MjYgYyAtMC43MDIwNywtMi4zMDA3IC0yLjQ1NTYsLTMuMjIyIC00Ljk4NjQsLTMuMjIyIHogbSAyMDQuNTIsNi45NzI0IGMgLTAuNDY0MjQsMC4wMjgxIC0wLjg2NzU0LDAuMjg2NTUgLTEuMjUzLDAuNzc3MzcgLTAuNTA4NjIsMC42NDc2MiAtMC41MjM2OCwwLjk1MjYgLTAuMTAyMjgsMS45MzQ5IDAuMjc1MDgsMC42NDEyNiAwLjc5NDEzLDEuNDQ3NSAxLjE1NDEsMS43OTM0IDAuOTUxMTIsMC45MTM4NCAxLjg3MDIsMC42OTkxIDIuNjgxNiwtMC42MjczNSAwLjgzNTM5LC0xLjM2NTcgMC41OTI1OSwtMi4yODg2IC0wLjg1OTE4LC0zLjI3NDggLTAuNjMxNywtMC40MjkxMyAtMS4xNTcsLTAuNjMxNjMgLTEuNjIxMiwtMC42MDM0OCB6IG0gNjcuMTg5LDAuNDE5MzcgYyAtMC4yNTMzMSwwLjAwOSAtMC42NzE2MSwwLjEyNDQxIC0xLjI2MTUsMC4zNzE2MyAtMS40NjA0LDAuNjEyIC0zLjE3NzQsMS45MzQ2IC0zLjE0MzYsMi40MjA3IDAuMDM4NSwwLjU1MDQ5IDAuNjY4NjMsMC4zNjMzMSAyLjUzNjcsLTAuNzUzNSAxLjkxNzMsLTEuMTQ2MyAyLjYyODMsLTIuMDY3MyAxLjg2ODQsLTIuMDM4OSB6IG0gLTc3LjAxNSwwLjIzMDE0IGMgLTAuODcwMzksMC4wNjA4IC0xLjE5MjQsMC43NTggLTAuNTkxNTQsMS4yODAzIDAuNTkwNTEsMC41MTMzMyAxLjYxODcsMC4xMTY1NiAxLjU2ODQsLTAuNjA1MTggLTAuMDM3OSwtMC41NDI1MyAtMC4yOTg2NSwtMC43MjI0NyAtMC45NzY4MywtMC42NzUwOCB6IG0gNy41OTQ2LDQuNDA4NSBjIC0wLjIxNDQ3LDAuMDE4NyAtMC40ODczOSwwLjMwODA0IC0wLjk4MDIzLDAuOTU2MzYgLTAuNjY3NDIsMC44Nzc5OCAtMS41OTIxLDEuNDc1IC0zLjEyNDgsMi4wMTY3IC0xLjE5NywwLjQyMzExIC0yLjU0MTYsMS4xNTYxIC0yLjk4ODQsMS42Mjk3IC0wLjg5NDE3LDAuOTQ4IC0xLjg0MTgsMi45OTUxIC0yLjA5ODUsNC41MzEyIC0wLjE5MTMyLDEuMTQ0OCAwLjM4OTU5LDIuNTYzMiAxLjM5NzksMy44MzA2IGggLTExLjY5NSBjIC0xLjUwODIsMCAtMi42NDQxLDEuMDA1NyAtMi44NjIzLDIuNjgxNiBsIC0zLjY1NSwyOC4wNjkgYyAtMTUuOTgyLDcuODUyOSAtMjguMDU1LDEzLjg0IC0zNi4zOTUsMTguMDMxIGwgMy40NzA5LC0yNi42NjEgaCAxOS40MzkgYyAxLjg0MzQsMCAyLjgxMjgsLTEuMDA0IDMuMDMxLC0yLjY3OTkgbCAyLjE4MjEsLTE2Ljc1OSBjIDAuMjE4MiwtMS42NzU4IC0wLjQ4ODY3LC0yLjY4MTYgLTIuMzMyMSwtMi42ODE2IGggLTYxLjY3MSBjIC0xLjY3NTgsMCAtMi44MTI4LDEuMDA1NyAtMy4wMzEsMi42ODE2IGwgLTIuMTgyMSwxNi43NTkgYyAtMC4yMTgyLDEuNjc1OCAwLjY1NjI3LDIuNjc5OSAyLjMzMjEsMi42Nzk5IGggMTkuNDM5IGwgLTIuNDE5LDE4LjU4IGMgLTAuNjQyOTksMC43NDcxNyAtMS4xMTEzLDEuNTk5IC0xLjA3NTcsMi4xMDg4IDAuMDMwOCwwLjQ0MDYyIDAuMjY0OCwxLjAxMjMgMC41OTMyNSwxLjU5MDUgbCAtMi4yMzgzLDE3LjE5NyBjIC0xLjE3NzUsMC4zMjk0MiAtMi40NzY4LDAuNTkyNzQgLTQuMDkxNCwwLjg0NTU2IC0zLjk3ODksMC42MjI5OSAtNC44OTYyLDAuNDA4ODQgLTYuMTU0MSwtMS40MzAzIC0xLjg0MjQsLTIuNjkzNiAtNi44NTU1LC00Ljc0MyAtOS4yMzI5LC0zLjc3NDMgLTEuMjA1MSwwLjQ5MTAzIC0yLjUyNTgsMi45NTM3IC0zLjMyNzcsNi4yMDE5IC0wLjQ5ODMxLDIuMDE4NCAtMC4zNzMsMi41NjUgMC45NTgwNyw0LjE1NjIgMC4zNzc1MSwwLjQ1MTI3IDAuMjIxLDAuOTM5NjYgLTAuODI2OCwyLjU2OSAtMC43MTEzOSwxLjEwNjIgLTEuNTY2MywyLjk5MjMgLTEuODk5MSw0LjE5MDMgLTAuMzMyODIsMS4xOTggLTAuODEzMDMsMi4xOTE2IC0xLjA2NzIsMi4yMDk0IC0wLjI1NDIsMC4wMTc3IC0wLjc5MjA4LC0wLjUyNDUxIC0xLjE5NjcsLTEuMjA1MyAtMC45MTgxNiwtMS41NDQ2IC00LjYwNSwtNC4wMzcgLTYuMjkwNSwtNC4yNTMzIC0xLjE2MjcsLTAuMTQ5MjEgLTEuNDAxMSwxMGUtNCAtMi45NzE0LDEuODU2NSAtMS4xOTYyLDEuNDEzMSAtMi4wODIzLDIuMTAxNSAtMi45NTQzLDIuMjk5NyAtMC42ODQ4NSwwLjE1NTY2IC0xLjc5ODIsMC40MDkzNyAtMi40NzM2LDAuNTYyNTcgLTEuNzg2LDAuNDA1MTEgLTQuMjQ1LDIuNDQ2NCAtNS4wODUyLDQuMjIxIC0wLjgyNzgyLDEuNzQ4MyAtMS4wNzE1LDQuNTk4IC0wLjU2MDg2LDYuNTU0NyAwLjQ0NzE3LDEuNzEzNiA0LjkxNjYsNS44OTQ0IDcuNDM5NSw2Ljk1ODggMi4yNzM5LDAuOTU5MjggMi42Mzg5LDEuNDQ1NSAxLjY1NTMsMi4yMDI1IC0wLjgyNTksMC42MzU2NSAtMC45MTQzOCwxLjk1OTIgLTAuMjA2MjcsMy4wODU2IDAuMjgxMTgsMC40NDcyOSAwLjgyNDgzLDAuNjYxMDEgMS41NDk2LDAuNjEwMyAwLjg3MTYxLC0wLjA2MDkgMS42NjAzLC0wLjY3MDQ4IDMuNjAyMSwtMi43ODM4IDEuMzY3NSwtMS40ODgzIDMuMjQ0NywtMy4yMjQgNC4xNzE1LC0zLjg1NzggMS4wNzUsLTAuNzM1MTcgMS42NjYzLC0xLjQwNjkgMS42MzQ4LC0xLjg1NjUgLTAuMDY5OCwtMC45OTc3MiAtMC42MjcyMywtMC44NDAxNSAtMi4yMTI4LDAuNjI3MzQgLTAuNzU5NDcsMC43MDI5NSAtMi40Njg1LDEuNzMwOSAtMy43OTgyLDIuMjg0NCAtMy44MDczLDEuNTg0OCAtMy45NDM3LDEuMTE0MSAtMC44MjMzOSwtMi44NTIgNC4wNDMsLTUuMTM5IDQuMDE5OCwtNS4wODY5IDMuNzIxNSwtOC4xOTgxIC0wLjIxOTMyLC0yLjI4NjYgLTAuMTY0NjQsLTIuNzQ5NyAwLjMyMzg5LC0yLjc4MzggMS4wNjIxLC0wLjA3NDMgMi4xMTMsMC42MTIyNSAxLjk2MjIsMS4yODAzIC0wLjMxMDE5LDEuMzc0MSAyLjA5NiwyLjg5NzQgNC4zMywyLjc0MTIgMS44Mzc0LC0wLjEyODQ4IDEuOTU5NiwwLjE4OTIzIDAuNzY4ODUsMS45OTk3IC0xLjE2MywxLjc2ODIgLTAuNzcwNTIsMi4xNzk0IDEuMjYxNSwxLjMyNDYgMS42MDUsLTAuNjc1MjMgNC4zMDY0LC0wLjgzMzc0IDguNTg1MSwtMC41MDQ2MSAxLjI3MywwLjA5NzkgMS41ODEsMC4wMTExIDEuNTQ5NiwtMC40MzgxMiAtMC4wNjYzLC0wLjk0ODMxIDMuODg0NywtNi4zNTYxIDQuMzUwNSwtNS45NTQ3IDAuMjQ3NywwLjIxMzQ4IC0wLjg1MjcxLDIuMzcwNyAtMi4wNjI3LDQuMDQzNyAtMC44Nzk4OSwxLjIxNjQgLTEuMTAzNSwxLjc5NTggLTAuNzk0NDIsMi4wNjQ0IDAuNjk1MjQsMC42MDQzNCAzLjAxNzcsLTEuMDczNSAzLjM2NTIsLTIuNDMxIDAuMTYwNTcsLTAuNjI3MzMgMC42NDEyMiwtMS41Mzg1IDEuMDY3MiwtMi4wMjUyIDEuMTYzNywtMS4zMjk4IDEuMDU2NSwtMy4yOTc2IC0wLjI2MjUzLC00Ljg0MzIgLTAuODA2NzcsLTAuOTQ1NDIgLTAuODMyODUsLTEuMDk0NSAtMC4zODE4NiwtMi4xMzk1IDAuMjY2NjksLTAuNjE3OTQgMS42ODMsLTIuMjY0NCAzLjE0NywtMy42NTg0IDEuMTAwMSwtMS4wNDc0IDEuOTMwMSwtMS45ODk3IDIuMjcyNCwtMi41NDE4IGwgLTguMTI4Miw2Mi40MzEgYyAtMC4yNDAwMywxLjg0MzQgMC42NTYyNiwyLjY4MTYgMi4zMzIxLDIuNjgxNiBoIDE3LjQyOCBjIDEuODQzNCwwIDIuNzkxLC0wLjgzODE0IDMuMDMxLC0yLjY4MTYgbCA4LjUxMzUsLTY1LjM4IGMgMC4xNTI3OSwwLjE4MDk4IDAuMzI1MzQsMC4zNzAxOCAwLjU0MDQsMC41Nzc5MSAwLjQ0NDA0LDAuNDI4OTQgMS4xMzk5LDAuNzU2MzggMS41NDYyLDAuNzI3OTIgMS45MDQsLTAuMTMzMTQgMi41OTYzLC0yLjgzMzggMS4wNjcyLC00LjE2MyAtMC45MzMxMSwtMC44MTExNSAtMS44NzQ1LC0wLjgwMzIzIC0yLjc4MzksMC4wMTUzIGwgMS4yMzI1LC05LjQ2ODIgYyAwLjA1MTgsLTAuMDMwNSAwLjA4NzksLTAuMDUxMyAwLjEzOTc5LC0wLjA4MTggMTAuNzg4LC02LjM1MDQgMjIuMTE3LC0xMi42NDcgMzYuNTYyLC0yMC4yOTcgbCAtMS40MTE1LDEwLjg0NyBjIC0yLjIxNywwLjY2MzkyIC0zLjczNzUsMi4wMTQgLTUuMTI2Miw0LjQ4NjkgLTAuNzY4NjQsMS4zNjg4IC0xLjQ1MDksMi42NzA0IC0xLjUxNTUsMi44OTMgLTAuMDc5NywwLjI3NDY2IC0wLjM3OCwwLjI3Mzc4IC0wLjkzMjUsLTAuMDAzIC0xLjY0MDMsLTAuODE5OTQgLTMuNDU4OCwtMC4wOTYxIC01LjI3MjgsMi4xMDAyIC0wLjY4NjIsMC44MzA4NCAtMS4zNTc5LDEuMjQzIC0yLjExMDUsMS4yOTU2IC0xLjIxMTIsMC4wODQ3IC0yLjM5MzYsMS4wNzY5IC0yLjMzMjEsMS45NTcgMC4wNTQ3LDAuNzgyMzIgMS4yMzIsMS44Mzc5IDEuOTkxMiwxLjc4NDkgMC4zNDc5MiwtMC4wMjQzIDEuMDMxOCwtMC40MDc2MSAxLjUyMDYsLTAuODUwNjcgMC40ODg4NCwtMC40NDMwOSAxLjAwMjksLTAuODEzNjIgMS4xNDIyLC0wLjgyMzM5IDAuMTM5MjcsLTAuMDEgMC43MDA0NCwwLjI4NzM0IDEuMjQ2MiwwLjY1ODAyIDEuNDc1MSwxLjAwMiA0LjAwNDQsMC43MzI4NiA1LjExNDIsLTAuNTQzODEgMC40NzMwNCwtMC41NDQyIDAuOTUzNzIsLTAuOTk2MjQgMS4wNjcyLC0xLjAwNDEgMC4xMTM0NCwtMC4wMDggMS4wNzI3LDAuNjYxIDIuMTMwOSwxLjQ4NjUgMC4zNjg5MSwwLjI4NzggMC43OTMzLDAuNTYwMDggMS4yMjA2LDAuODE0ODggbCAtOS41MDA2LDcyLjk3IGMgLTAuMjE4MiwxLjY3NTggMC42NTUwNywyLjY4MTYgMi4xNjMzLDIuNjgxNiBoIDYxLjY3MSBjIDIuMDExLDAgMi44MTI4LC0xLjAwNTcgMy4wMzEsLTIuNjgxNiBsIDIuMTgyMSwtMTYuNzU5IGMgMC4yNDAwMiwtMS44NDM0IC0wLjMyMTEsLTIuNjgxNiAtMi4zMzIxLC0yLjY4MTYgaCAtNDEuODk2IGwgNC40MDg1LC0zMy44NTEgaCAzMi4wMDggYyAxLjY3NTgsMCAyLjgxMTUsLTEuMDA1MiAzLjA1MTUsLTIuODQ4NiBsIDIuMTU5OSwtMTYuNTkxIGMgMC4yNDAwMiwtMS44NDM0IC0wLjYzNDEsLTIuODQ4NiAtMi4zMDk5LC0yLjg0ODYgaCAtNS41ODEzIGMgMC40NDUxNCwtMS42NjA2IC0wLjEzMDA5LC0zLjM1NDggLTEuNjUxOSwtNC43NTggLTAuOTIzOCwtMC44NTE3OCAtMS4yODcsLTEuMTA1OSAtMi4wMTUsLTEuMDU1MiAtMC4yNDI2NywwLjAxNjkgLTAuNTI0NjcsMC4wNjc3IC0wLjg4MzA1LDAuMTQxNDggLTIuMTAxMywwLjQzMjg0IC00LjE3MSwyLjg3NzMgLTQuMDM4Niw0Ljc3MTYgMC4wMjA1LDAuMjkyOSAwLjEwOTY3LDAuNTk2NDcgMC4yMzAxNCwwLjkwMDExIGggLTE4LjA2OSBsIDAuNDQzMjMsLTMuNDA5NSAwLjEyMjc1LC0wLjE3Mzg4IGMgMC4zMjk2MywtMC40NzA3OCAwLjU4ODk1LC0xLjAwMzkgMC41NzYyLC0xLjE4NDggLTAuMDEwNiwtMC4xNTE0NyAtMC4yMTMxNiwtMC4yMjc4OCAtMC40ODkyNiwtMC4yNTA2IGwgMy43MTEyLC0yOC40OTggaCA0MS44OTYgYyAyLjAxMSwwIDIuODMzMywtMS4xNzI4IDMuMDUxNSwtMi44NDg2IGwgMi4xODIxLC0xNi43NTkgYyAwLjIxODIxLC0xLjY3NTggLTAuMzIxMDksLTIuNjgxNiAtMi4zMzIxLC0yLjY4MTYgaCAtMzguMDI0IGMgMC43MDk2MSwtMS4yNjI0IDEuMTE2NywtMi45NzIgMS4zNTUzLC01LjM3MzQgMC4xNjg2NiwtMS42OTc2IDAuMzg5OTgsLTMuNDY5MSAwLjQ5MjY3LC0zLjkzNjIgMC4yMzEzLC0xLjA1MjIgLTAuMjYyNywtMS4wNDk5IC0xLjQyODYsMC4wMDcgLTAuOTk3NDcsMC45MDQwNyAtMi40MTgxLDEuMTM4MyAtMy4xMzMzLDAuNTE2NTQgLTAuMjYxMjIsLTAuMjI3MDggLTAuNTIzOTgsLTEuMDg3MyAtMC41ODQ3MywtMS45MTEgLTAuMDYwNywtMC44MjM3NCAtMC4yODY1LC0xLjczNTMgLTAuNTAxMiwtMi4wMjY5IC0wLjEyMTc5LC0wLjE2NTQ0IC0wLjIyOTMxLC0wLjI1MTYxIC0wLjM1Nzk5LC0wLjI0MDM3IHogbSA3LjkzNTYsMC4wODE4IGMgLTAuODgxODQsMC4wNjE3IC0xLjczNTQsMC43ODc3NiAtMS43MzU0LDEuMjU0NyAwLjMzNzk0LDAuNDY5OTQgMS40NDk3LDAuMzM5NTEgMS45NDM0LC0wLjIyODQ0IDAuNTY4NDgsLTAuNjUzOTYgMC40ODMwOCwtMS4wNzQ2IC0wLjIwNzk4LC0xLjAyNjMgeiBtIDE2LjI4NCwwLjUyODQ3IGMgLTAuMTUxNzYsMC4wMTIgLTAuMzE1MjksMC4xNDY2NSAtMC40NTg1OCwwLjQxOTM2IC0wLjExNjk1LDAuMjIyNDIgLTAuMTAzMzUsMC42Mzk4OCAwLjAzMDcsMC45MjczOSAwLjM5NDQsMC44NDYgMS4wMTI5LDAuNTQ3NjEgMC45NDI3MywtMC40NTUxNyAtMC4wNDEzLC0wLjU5MDI2IC0wLjI2MTg5LC0wLjkxMTU1IC0wLjUxNDg0LC0wLjg5MTU4IHogbSAzMy42NCwxLjA0NjcgYyAtMC42ODQwOCwwLjAyMjQgLTIuNTM3NCwwLjkzOTY3IC0yLjk2MTEsMS41MzQzIC0wLjQwMjM0LDAuNTY0NTQgLTAuMzM1NTIsMC41OTQ4NCAwLjYzOTI3LDAuMjgyOTggMS4yNTc5LC0wLjQwMjQgMi44Mzk1LC0xLjUwNDUgMi41MzY3LC0xLjc2NzggLTAuMDQyNCwtMC4wMzY4IC0wLjExNzA4LC0wLjA1MjYgLTAuMjE0OCwtMC4wNDk0IHogbSAtNS40MDkyLDMuMzcwMyBjIC0wLjAyNjksLTAuMDQ0OSAtMC4yNDk4MiwwLjAyNzQgLTAuNjkzODMsMC4xNzU1OSAtMS40NjQxLDAuNDg4NTIgLTMuODU1MywxLjkxNjEgLTQuMzQwMywyLjU5MTIgLTAuMzk1OTMsMC41NTEyOSAtMC4zNDE3MywwLjU4Mzk0IDAuNDU1MTcsMC4yNzQ0NyAxLjIyNTIsLTAuNDc1ODEgMy4yNDYxLC0xLjcxNjMgNC4wOTQ4LC0yLjUxMjggMC4zNDExMSwtMC4zMjAxMSAwLjUxMTAzLC0wLjQ4MzU0IDAuNDg0MTQsLTAuNTI4NDggeiBtIC00MDQuOTcsNy45MzczIGMgLTEuODQzNCwwIC0yLjgxMjgsMS4wMDU3IC0zLjAzMSwyLjY4MTYgbCAtMTYuNzU4LDEyOC43IGMgLTAuMjQwMDMsMS44NDM0IDAuNDg4NjcsMi42ODE2IDIuMzMyMSwyLjY4MTYgaCA0MC4yMiBjIDE1Ljc1MywwIDI1LjIyMywtOC4zNzk1IDI3LjI3NCwtMjQuMTMyIGwgMTEuMTQ5LC04NS42MzYgYyAyLjA1MTIsLTE1Ljc1MyAtNS4yMTM4LC0yNC4yOTkgLTIwLjk2NywtMjQuMjk5IHogbSAxMDUuMjQsMCBjIC0xNS43NTMsMCAtMjUuMjIzLDguMzc5NiAtMjcuMjc0LDI0LjEzMiBsIC0xMS4xNzMsODUuODAzIGMgLTIuMDUxMiwxNS43NTMgNS4yMzc3LDI0LjEzMiAyMC45OTEsMjQuMTMyIGggMTguNzY5IGMgMTUuNzUzLDAgMjUuMjIzLC04LjM3OTUgMjcuMjc0LC0yNC4xMzIgbCAxMS4xNzEsLTg1LjgwMyBjIDIuMDUxMiwtMTUuNzUzIC01LjIzNiwtMjQuMTMyIC0yMC45ODksLTI0LjEzMiB6IG0gMzA5Ljc5LDAgYyAtMS42NzU4LDAgLTIuODEyOCwxLjAwNTcgLTMuMDMxLDIuNjgxNiBsIC0xNi43NTgsMTI4LjcgYyAtMC4yMTgyMSwxLjY3NTggMC42NTYyNSwyLjY4MTYgMi4zMzIxLDIuNjgxNiBoIDE3LjQyOCBjIDEuNjc1OCwwIDIuODEyOCwtMS4wMDU3IDMuMDMxLC0yLjY4MTYgbCA1LjQ5OTUsLTQyLjIzMiBoIDExLjU2MyBsIDUuNjg1Myw0Mi41NjYgYyAwLjEzODc4LDEuNTA4MiAwLjg2NzY2LDIuMzQ3NCAyLjU0MzUsMi4zNDc0IGggMTcuNDI4IGMgMS44NDM0LDAgMi45ODA0LC0xLjAwNjQgMi43Mzk1LC0zLjAxNzQgbCAtNS44NDU2LC00My45MDcgYyA4LjUwMjIsLTMuNTE5MiAxMy42NTEsLTEwLjg5MyAxNS4xMTMsLTIyLjEyMSBsIDUuMzI1NiwtNDAuODkgYyAyLjA1MTEsLTE1Ljc1MyAtNS4yMzc3LC0yNC4xMzIgLTIwLjk5MSwtMjQuMTMyIHogbSAtMzA3Ljc0LDIxLjYyIGggOS43MjA1IGMgNC4zNTcyLDAgNi4zOTc2LDIuMzQ1OSA1LjgzMDIsNi43MDMxIGwgLTEwLjA4Miw3Ny40MjMgYyAtMC41ODkxNiw0LjUyNDggLTMuMjE4Nyw2LjcwMzEgLTcuNTc1OSw2LjcwMzEgaCAtOS43MTg4IGMgLTQuMzU3MiwwIC02LjQxOTQsLTIuMTc4MyAtNS44MzAyLC02LjcwMzEgbCAxMC4wOCwtNzcuNDIzIGMgMC41NjczNCwtNC4zNTcyIDMuMjE4NywtNi43MDMxIDcuNTc1OSwtNi43MDMxIHogbSAtOTAuMDU3LDAuNTAxMiBoIDE1LjQxOCBjIDQuMzU3MiwwIDYuMzk3MiwyLjM0NzEgNS44MDgxLDYuODcxOCBsIC05LjkyODQsNzYuMjUgYyAtMC41ODkxNiw0LjUyNDcgLTMuMjE4Nyw2LjcwMzEgLTcuNTc1OSw2LjcwMzEgaCAtMTUuNDE4IHogbSA0MTUuMDMsMCBoIDE2LjU5MSBjIDQuMzU3MiwwIDYuMzk3NiwyLjM0NzYgNS44MzAyLDYuNzA0OCBsIC00LjEwMzMsMzEuNTA1IGMgLTAuNTY3MzQsNC4zNTcyIC0zLjIxODcsNi43MDMgLTcuNTc1OSw2LjcwMyBoIC0xNi41OTEgbCAwLjgxMzE2LC02LjIzNzcgYyAwLjQ3Mjc2LDAuMjgwNjYgMS43MTIsMC4yNDQxIDIuMDIzNSwtMC4xMTQyMiAwLjMyNjYsLTAuMzc1NzEgLTAuNTQ3NTUsLTEuNTg0MiAtMS4xMTY2LC0xLjU0NDUgLTAuMjY3MjgsMC4wMTg3IC0wLjUzNzc1LDAuMTk2MzIgLTAuNzQ4MzksMC40Mjk2IHogbSAtNDUuNzI2LDMuOTkwOCBjIC0xLjA2MTQsMC4wNTE0IC0yLjI4NjYsMC41OTM4NSAtNC4zMTgxLDEuNzA0OCAtMi42NDIxLDEuNDQ0OCAtMy4wMDgxLDEuNTI4OCAtNS41NjQzLDEuMjg4OCAtMS42MTg4LC0wLjE1MjA0IC0zLjA2NjIsLTAuMDYyNCAtMy41NDI1LDAuMjE4MjEgLTAuNzU0NDgsMC40NDQ1MyAtMC43NjczMywwLjUyMTYgLTAuMjA0NTcsMS4yMzI1IDAuMzMxMzcsMC40MTg2NCAxLjIzNTksMC44MTgyNyAyLjAxNjcsMC44OTE1OSAyLjE2OSwwLjIwMzcyIDMuOTQ3MywxLjM4MjIgNS44ODMxLDMuODk3IDAuOTcwMDYsMS4yNjAyIDIuMjM3NiwyLjYxOTkgMi44MTYyLDMuMDIwOCAxLjI4NjQsMC44OTEzOCA1LjU0MzksMS4wMzc2IDcuNDg3MiwwLjI1NzQyIDQuODIyMywtMS45MzYxIDMuNzYyMywtOC40Mjk3IC0xLjkwNTksLTExLjY3NCAtMC44NDUyNiwtMC40ODM4MyAtMS41MTY2LC0wLjc2ODgxIC0yLjIyMTMsLTAuODI4NTEgLTAuMTQ2ODEsLTAuMDEyNCAtMC4yOTUwMSwtMC4wMTU5IC0wLjQ0NjY0LC0wLjAwOSB6IG0gLTMxLjg4NCwzLjk4NCBjIC0xLjE1MjYsMC4wODA2IC0zLjM5NTksMS45NjQ5IC0zLjU4MTcsMy4wMDg5IC0wLjI2NzgyLDEuNTA1MSAxLjI5NCwzLjU2NjMgMi44OTY0LDMuODIzOCAyLjEzNzMsMC4zNDM0IDQuMTg0LC0xLjI4MzQgNC4wNDg4LC0zLjIxNjkgLTAuMTAzNzksLTEuNDg0NCAtMi4xNjQsLTMuNjk5NiAtMy4zNjM0LC0zLjYxNTggeiBtIC0yLjQyMDcsMTkuNDggYyAtMS4xNTIxLDAuMDgwNiAtMi43MzM1LDEuNTcyOCAtMy4wNDk4LDIuODc5MyAtMC4yODEyMywxLjE2MTcgMC4zMjMwNSwyLjUxNTcgMS4yNTEzLDIuODA2IDEuMjA4OSwwLjM3ODE0IDIuNTQ3LC0wLjA5MzQgMy40MzUxLC0xLjIxMDQgMC45MDA4MiwtMS4xMzMxIDAuOTEwNjIsLTEuNjIzNyAwLjA2NjUsLTMuMzAzOCAtMC41MTEwMywtMS4wMTcyIC0wLjgyMjQzLC0xLjIzMjggLTEuNzAzLC0xLjE3MTIgeiBtIC05MC40NjIsNi45NzQxIGMgLTAuMjAyNzMsMC4wMjk1IC0wLjM5NDQ5LDAuMjU3MjggLTAuNDUwMDUsMC42NjQ4NiAtMC4wNDYzLDAuMzQgMC4xNzQ4LDAuNTY1MTkgMC41MzAxOCwwLjU0MDQgMC4zODA5NiwtMC4wMjY2IDAuNTQ0NDQsLTAuMjgyNDUgMC40MzgxMiwtMC42ODE5IC0wLjEwMjM0LC0wLjM4NDU4IC0wLjMxNTUxLC0wLjU1Mjg4IC0wLjUxODI1LC0wLjUyMzM2IHogbSAxNjcuMjQsNS45MjA2IGMgLTAuNDY4MTgsMC4wNjAzIC0wLjgxNTI0LDAuNjIwNzEgLTAuNzUzNSwxLjUwMzYgMC4wNzIxLDEuMDMxIDAuMTgwODIsMS4xMjcyIDEuMDg1OSwwLjk1ODA3IDEuMTU1MSwtMC4yMTU4MyAxLjM5MDUsLTEuMDI4NyAwLjU3NzkxLC0xLjk5MTEgLTAuMzA2MjEsLTAuMzYyNjcgLTAuNjI5NDMsLTAuNTA2NjggLTAuOTEwMzMsLTAuNDcwNTEgeiBtIC0yMDkuMjgsNi4zMDA3IGMgLTAuODUyNzUsMC4xNjIxOCAtMi4xNzUxLDEuMzc1NyAtMi4xMjU4LDIuMDgxNSAwLjA0NzYsMC42ODE3OSAxLjAwMTQsMS41NzMxIDEuOTg5NCwxLjg1OTkgMC44NjczNSwwLjI1MTggMS4xMTgyLDAuMjE4ODMgMS44NjUsLTAuMjUwNiAxLjM1MTgsLTAuODQ5NzcgMC40NTA0NSwtMy4yMjkzIC0xLjM5NzksLTMuNjkwOCAtMC4wOTczLC0wLjAyNDMgLTAuMjA4OTEsLTAuMDIzMiAtMC4zMzA3MywwIHogbSA3My40OTUsMi41Mzg0IGMgLTAuMjQ0MzEsLTAuMDEgLTAuNDkzMywtMC4wMDkgLTAuNzQxNTYsMC4wMDcgLTEuNzEyOCwwLjEwNjc2IC0yLjAwMTUsMC4yNDE2NyAtMi44MjE0LDEuMzIyOSAtMC41MDIyNiwwLjY2MjM4IC0wLjg1ODEzLDEuNTQ5NyAtMC43OTEwMSwxLjk3MDcgMC4xMjE4OCwwLjc2NDc2IDEuMjY3MiwyLjE5MDMgMi4wODE1LDIuNTkxMiAxLjE4NDksMC41ODM0IDYuMjYyNiwtMy4xMzg3IDUuODQyMiwtNC4yODIzIC0wLjMyMTI3LC0wLjg3Mzg1IC0xLjg1OTYsLTEuNTM5MyAtMy41Njk3LC0xLjYwOTMgeiBtIDUxLjU5OSw5LjAyMTUgYyAtMC4yOTAzOCwwLjAyMDggLTAuNTgzNDUsMC4xMDk4OSAtMC44NTA2NywwLjI3Nzg4IC0wLjkyNjQ3LDAuNTgyNDcgLTAuOTAyMzksMi4xMzAxIDAuMDQwOSwyLjU5NDYgMS40Nzg0LDAuNzI4MDYgMi42OTU2LDAuMDA3IDIuNTg3OCwtMS41MzQzIC0wLjA1OTUsLTAuODUxMTcgLTAuOTA2OSwtMS40MDA2IC0xLjc3OCwtMS4zMzgyIHogbSAtNDYuNTExLDcuMTEwNSBjIC0wLjY5ODU3LDAuMDU2NiAtMS4xNDk2LDEuMzQxNCAtMC42NTk3MywyLjI3MjQgMC43ODU3MywxLjQ5MzQgMi42ODk0LDAuODkwOTMgMi41MzE2LC0wLjgwMTIzIC0wLjA0OTEsLTAuNTI1NzUgLTAuNTQ2MzMsLTAuOTc3NyAtMS41NTgxLC0xLjQxNDkgLTAuMTA3ODgsLTAuMDQ2NiAtMC4yMTM4NywtMC4wNjQzIC0wLjMxMzY4LC0wLjA1NjMgeiBtIC01Ny44NjIsMS4xNzQ2IGMgLTAuNDYxMzgsMC4wMzIzIC0xLjEyNDcsMS4wMzQyIC0wLjg0NTU1LDEuMjc2OCAwLjM4MjQxLDAuMzMyNDIgMS4yNDU4LC0wLjIyODc1IDEuMjA3LC0wLjc4NDE4IC0wLjAxOTgsLTAuMjgzNDEgLTAuMTgyODYsLTAuNTA1MjQgLTAuMzYxNDEsLTAuNDkyNjcgeiBtIC0xMi4wMiwxMi43NTMgYyAtMC4yNzM4NSwwLjAzODkgLTAuNDk0NTEsMC4yODExMSAtMC40NjU0LDAuNjk3MjUgMC4wMjYxLDAuMzcyOTkgMC4xNjUxNSwwLjc4MDc2IDAuMzEwMjcsMC45MDY5MiAwLjY5Mjg4LDAuNjAyMyAxLjM2NDQsLTAuMTcyMzIgMC45MzkzMSwtMS4wODQyIC0wLjE4Mzc0LC0wLjM5NDE4IC0wLjUxMDM0LC0wLjU1ODg5IC0wLjc4NDE4LC0wLjUxOTk2IHoiCiAgICAgICBpZD0icGF0aDE1IgogICAgICAgaW5rc2NhcGU6Y29ubmVjdG9yLWN1cnZhdHVyZT0iMCIKICAgICAgIHN0eWxlPSJmaWxsOiNmZjIxMjE7ZmlsdGVyOnVybCgjZmlsdGVyNjU1OCkiIC8+CiAgPC9nPgo8L3N2Zz4K" alt="Doxter Logo">
+<img src="doxter_logo.svg" alt="Doxter Logo">
 </div>
 </div>
 <div class="paragraph">
-<p>Doxter is a binary tool to generate AsciiDoc documentation from  source
-files, by using a special notations in comments delimiters to markup tagged
-regions of text and code that will be exported to an AsciiDoc source document
-where the various regions will be sorted according to their tag&#8217;s weight.
-It currently supports PureBasic, SpiderBasic and Alan IF source files.
-Released under <a href="#_license">MIT License</a>.</p>
+<p>Welcome to Doxter, a <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself" target="_blank" rel="noopener">DRY</a> Documentation from source generator leveraging Asciidoctor tagged regions to allow contents reuse across documents via selective inclusions, and a custom weights-based system to control the order in which regions should be rearranged in the final document.</p>
 </div>
 <div class="paragraph">
+<p>Written in PureBasic for <a href="https://www.purebasic.com/" target="_blank" rel="noopener">PureBasic</a>, <a href="https://www.spiderbasic.com/" target="_blank" rel="noopener">SpiderBasic</a> and <a href="https://www.alanif.se/" target="_blank" rel="noopener">Alan IF</a> (more languages coming soon).</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
 <p><a href="https://github.com/tajmone/doxter" class="bare">https://github.com/tajmone/doxter</a></p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -509,62 +511,44 @@ Released under <a href="#_license">MIT License</a>.</p>
 <h2 id="_about_doxter"><a class="anchor" href="#_about_doxter"></a>About Doxter</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Doxter was conceived as a practical solution to simplify management of source code
-documentation. Specifically, it&#8217;s birth and growth are tied to the
-<a href="https://github.com/tajmone/PBCodeArcProto" target="_blank" rel="noopener">development of prototype tools</a> for
-the <a href="https://github.com/SicroAtGit/PureBasic-CodeArchiv-Rebirth" target="_blank" rel="noopener">PureBasic-CodeArchiv-Rebirth</a>
-project, which has challenged me in keeping the documentation of multiple
-modules always up to date with their current code.</p>
+<p>Doxter was conceived as a practical solution to simplify management of source code documentation.
+Specifically, its birth and growth are tied to the <a href="https://github.com/tajmone/PBCodeArcProto" target="_blank" rel="noopener">development of prototype tools</a> for the <a href="https://github.com/SicroAtGit/PureBasic-CodeArchiv-Rebirth" target="_blank" rel="noopener">PureBasic-CodeArchiv-Rebirth</a> project, which has challenged me in keeping the documentation of multiple modules always up to date with their current code.</p>
 </div>
 <div class="paragraph">
-<p>Working on separate documentation and source code files is both tiring and a
-cause of redundancy&#8201;&#8212;&#8201;you&#8217;ll need to include some documentation in the source
-file comments, and you also need to include some code excerpts in the documentation.
+<p>Working on separate documentation and source code files is both tiring and a cause of redundancy&#8201;&#8212;&#8201;you&#8217;ll need to include some documentation in the source file comments, and you also need to include some code excerpts in the documentation.
 Why duplicate the effort when you can keep it all in one place?</p>
 </div>
 <div class="paragraph">
-<p>Code generators are not a new idea (and surely, not my original idea either);
-there are plenty of code generator tools and frameworks out there, but most
-of them are not language agnostic, don&#8217;t integrate well with PureBasic, or
-require a complex setup envolving lot&#8217;s of dependencies.</p>
+<p>Code generators are not a new idea (and surely, not my original idea either); there are plenty of code generator tools and frameworks out there, but most of them are not language agnostic, don&#8217;t integrate well with PureBasic, or require a complex setup envolving lots of dependencies.</p>
 </div>
 <div class="paragraph">
-<p>Doxter was originally designed to work with PureBasic, leveraging the power
-of AsciiDoc and with simplicity in mind. It now supports SpiderBasic and Alan
-IF sources too and, ultimately, it will be become a language agnostic tool
-usable with almost any language.</p>
+<p>Doxter was originally designed to work with PureBasic, leveraging the power of AsciiDoc and with simplicity in mind.
+It now supports SpiderBasic and Alan IF sources too and, ultimately, it will be become a language agnostic tool usable with almost any language.</p>
 </div>
 <div class="sect2">
 <h3 id="_who_needs_doxter"><a class="anchor" href="#_who_needs_doxter"></a>Who Needs Doxter?</h3>
 <div class="paragraph">
-<p>Any PureBasic or SpiderBasic programmer who knows AsciiDoc and wants to include
-documentation of his/her code directly in the source files can benefit from
-Doxter by automating the task of producing always up-to-date documentation
-in various formats (HTML5, man pages, PDF, and any other output format supported
-by Asciidoctor&#8217;s backends).</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_doxters_engine"><a class="anchor" href="#_doxters_engine"></a>Doxter&#8217;s Engine</h3>
-<div class="paragraph">
-<p>At the core of the command line Doxter tool lies the Doxter Engine, which is
-available as an independent module that can be used other applications too.</p>
-</div>
-<div class="paragraph">
-<p>For more information see the
-<a href="doxter_engine.html"><em>Doxter Engine API Documentation</em></a>.</p>
+<p>Any PureBasic or SpiderBasic programmer who knows AsciiDoc and wants to include documentation of his/her code directly in the source files can benefit from Doxter by automating the task of producing always up-to-date documentation in various formats (HTML5, man pages, PDF, and any other output format supported by Asciidoctor backends).</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_acknowledgements"><a class="anchor" href="#_acknowledgements"></a>Acknowledgements</h3>
 <div class="paragraph">
-<p>Although quite different in design, Doxter was inspired by Lou Acresti&#8217;s
-<a href="http://lou.wtf/cod/" target="_blank" rel="noopener">Cod</a>, an unassuming doc format (<em>Documentus modestus</em>)&#8201;&#8212;&#8201;the simplicity of Cod sparkled the idea that I could implement something
-similar, but exploiting AsciiDoc tagged regions instead.</p>
+<p>Although quite different in design, Doxter was inspired by Lou Acresti’s <a href="http://lou.wtf/cod/" target="_blank" rel="noopener">Cod</a>, an unassuming doc format (<em>Documentus modestus</em>).
+The simplicity of Cod sparkled the idea that I could implement something similar, but exploiting AsciiDoc tagged regions instead.</p>
 </div>
 <div class="paragraph">
-<p>My gratitude to <a href="http://lou.wtf/" target="_blank" rel="noopener">Lou Acresti</a> (aka <a href="https://github.com/namuol" target="_blank" rel="noopener">@namuol</a>)
-for having created such an inspiring tool like Cod.</p>
+<p>My gratitude to <a href="http://lou.wtf/" target="_blank" rel="noopener">Lou Acresti</a> (aka <a href="https://github.com/namuol" target="_blank" rel="noopener">@namuol</a>) for having created such an inspiring tool like Cod.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_doxter_engine"><a class="anchor" href="#_doxter_engine"></a>Doxter Engine</h3>
+<div class="paragraph">
+<p>At the core of the command line Doxter tool lies the Doxter Engine, which is available as an independent module that can be used other applications too.</p>
+</div>
+<div class="paragraph">
+<p>For more information see the
+<a href="doxter_engine.html"><em>Doxter Engine API Documentation</em></a>.</p>
 </div>
 </div>
 </div>
@@ -573,17 +557,13 @@ for having created such an inspiring tool like Cod.</p>
 <h2 id="_features"><a class="anchor" href="#_features"></a>Features</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Doxter is a command line tool that parses a source file and extracts from it
-tag-delimited regions of code, these regions are then processed according to
-some very simple rules in order to produce a well formed AsciiDoc source
-document which can then be converted to HTML via Asciidoctor (Ruby).</p>
+<p>Doxter is a command line tool that parses a source file and extracts from it tag-delimited regions of code, these regions are then processed according to some very simple rules in order to produce a well formed AsciiDoc source document which can then be converted to HTML via Asciidoctor (Ruby).</p>
 </div>
 <div class="sect2">
 <h3 id="_cross_documents_selective_inclusions"><a class="anchor" href="#_cross_documents_selective_inclusions"></a>Cross Documents Selective Inclusions</h3>
 <div class="paragraph">
-<p>Every tagged region in the source file becomes an AsciiDoc tagged region in
-the output document. The following PureBasic source comments contain a simple
-Doxter region:</p>
+<p>Every tagged region in the source file becomes an AsciiDoc tagged region in the output document.
+The following PureBasic source comments contain a simple Doxter region:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -604,8 +584,7 @@ I'm a Doxter _region_.
 </div>
 </div>
 <div class="paragraph">
-<p>Regions can be named in the source file, by providing an identifier after the
-<code>;&gt;</code> marker, allowing you to control regions' tag names in the AsciiDoc output:</p>
+<p>Regions can be named in the source file, by providing an identifier after the <code>;&gt;</code> marker, allowing you to control regions' tag names in the AsciiDoc output:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -627,23 +606,16 @@ This a _named_ region.
 </div>
 </div>
 <div class="paragraph">
-<p>This is a very practical feature for it allows other AsciiDoc documents to
-selectively include parts of a source file&#8217;s documentation using tag filtering.</p>
+<p>This is a very practical feature for it allows other AsciiDoc documents to selectively include parts of a source file documentation using tag filtering.</p>
 </div>
 <div class="paragraph">
-<p>For example, when documenting an application that relies on imported Modules,
-the main document can selectively include regions from the Doxter-generated
-modules' documentation, thus allowing to maintain both independent documentation
-for every Module&#8217;s API, as well as having a main document that extrapolates
-parts from the modules' docs in a self-updating fashion.</p>
+<p>For example, when documenting an application that relies on imported Modules, the main document can selectively include regions from the Doxter-generated modules' documentation, thus allowing to maintain both independent documentation for every Module API, as well as having a main document that extrapolates parts from the modules' docs in a self-updating fashion.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_ordo_ab_chao_structured_docs_from_scattered_comments"><a class="anchor" href="#_ordo_ab_chao_structured_docs_from_scattered_comments"></a><em>Ordo ab Chao</em>: Structured Docs from Scattered Comments</h3>
 <div class="paragraph">
-<p>Each tagged region in the source file can be assigned a weight, so that in the
-final document the regions will be reordered in a specific way, forming a well
-structured document that presents contents in the right order.</p>
+<p>Each tagged region in the source file can be assigned a weight, so that in the final document the regions will be reordered in a specific way, forming a well structured document that presents contents in the right order.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -679,17 +651,12 @@ And this is Sec 1.
 </div>
 </div>
 <div class="paragraph">
-<p>This feature allows to keep each paragraph near the code lines that it
-discusses, making the source code more readable and freeing the documentation
-from the constraints imposed by the order in which the code is organized.</p>
+<p>This feature allows to keep each paragraph near the code lines that it discusses, making the source code more readable and freeing the documentation from the constraints imposed by the order in which the code is organized.</p>
 </div>
 <div class="paragraph">
-<p>Furthermore, regions with same tag names in the source code will be merged
-into a single region in the final document. Each region&#8217;s fragment (aka
-subregion) can be assigned a subweight which will be used to sort the order of
-the fragments before merging them together. This allows you to control the
-number of regions in the final document, and keep related topics under a same
-region.</p>
+<p>Furthermore, regions with same tag names in the source code will be merged into a single region in the final document.
+Each region fragment (aka subregion) can be assigned a subweight which will be used to sort the order of the fragments before merging them together.
+This allows you to control the number of regions in the final document, and keep related topics under a same region.</p>
 </div>
 <div class="paragraph">
 <p>In the following example:</p>
@@ -727,8 +694,7 @@ Next
 </div>
 </div>
 <div class="paragraph">
-<p>... all the regions named <code>even_macro_intro</code> are merged into a single region
-after being sorted according to ther subeweights (<code>.1</code>, <code>.2</code> and <code>.3</code>):</p>
+<p>... all the regions named <code>even_macro_intro</code> are merged into a single region after being sorted according to ther subeweights (<code>.1</code>, <code>.2</code> and <code>.3</code>):</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -771,30 +737,19 @@ Next
 </div>
 </div>
 <div class="paragraph">
-<p>Keep your comments next to the code they belong to, allowing the source file
-to follow its natural course and provide meaningful snippets of in-code
-documentation, and use weighed tag regions to ensure that these out-of-order
-fragments will be collated in a meaningful progressive order in the output
-document.</p>
+<p>Keep your comments next to the code they belong to, allowing the source file to follow its natural course and provide meaningful snippets of in-code documentation, and use weighed tag regions to ensure that these out-of-order fragments will be collated in a meaningful progressive order in the output document.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_mix_text_and_source_code_in_your_documentation"><a class="anchor" href="#_mix_text_and_source_code_in_your_documentation"></a>Mix Text and Source Code in Your Documentation</h3>
 <div class="paragraph">
-<p>Regions can contain both of AsciiDoc comments markers and source code, allowing
-to include fragments of the original source code in the final documentation,
-along with AsciiDoc text.</p>
+<p>Regions can contain both of AsciiDoc comments markers and source code, allowing to include fragments of the original source code in the final documentation, along with AsciiDoc text.</p>
 </div>
 <div class="paragraph">
-<p>AsciiDoc markers are comment lines with special symbols after the native
-language&#8217;s comment delimiters, which will be treated as normal comments by the
-source language, but which Doxter will strip of the comment delimiter and turn
-into AsciiDoc lines in the output document.</p>
+<p>AsciiDoc markers are comment lines with special symbols after the native language comment delimiters, which will be treated as normal comments by the source language, but which Doxter will strip of the comment delimiter and turn into AsciiDoc lines in the output document.</p>
 </div>
 <div class="paragraph">
-<p>Any source code (i.e. non-AsciiDoc comments) inside a tagged region will be
-rendered in the final document as an AsciiDoc source code block set to the
-source&#8217;s language (e.g. PureBasic).</p>
+<p>Any source code (i.e. non-AsciiDoc comments) inside a tagged region will be rendered in the final document as an AsciiDoc source code block set to the source language (e.g. PureBasic).</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -853,9 +808,7 @@ Next
 <div class="sectionbody">
 <div class="paragraph">
 <p>Doxter is a binary console application (a compiled executable).
-There is no installation, just place the binary file (<code>Doxter.exe</code> on Windows)
-in your working folder, or make it availabe system-wide by adding it to the
-system <code>PATH</code> environment variable.</p>
+There is no installation, just place the binary file (<code>Doxter.exe</code> on Windows) in your working folder, or make it availabe system-wide by adding it to the system <code>PATH</code> environment variable.</p>
 </div>
 <div class="sect2">
 <h3 id="_input_file_validation"><a class="anchor" href="#_input_file_validation"></a>Input File Validation</h3>
@@ -999,9 +952,8 @@ columns, instead of numbers, because the Header has no weight or subweight.</p>
 <h2 id="_documenting_your_source_files"><a class="anchor" href="#_documenting_your_source_files"></a>Documenting Your Source Files</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Now comes the juicy part, how to incorporate documentation into you source
-files. The good news is that the system employed by Doxter is very easy to
-learn and simple to use.</p>
+<p>Now comes the juicy part, how to incorporate documentation into you source files.
+The good news is that the system employed by Doxter is very easy to learn and simple to use.</p>
 </div>
 <div class="sect2">
 <h3 id="_doxter_markers_primer"><a class="anchor" href="#_doxter_markers_primer"></a>Doxter Markers Primer</h3>
@@ -1097,21 +1049,15 @@ region tag, which would split the text in multiple paragraphs in the final
 document.</p>
 </div>
 <div class="paragraph">
-<p>That&#8217;s about all you&#8217;ll have to learn: memorize those five base symbols, their
-variants and modifiers, and learn how to use them correctly and wisely.</p>
+<p>That&#8217;s about all you&#8217;ll have to learn: memorize those five base symbols, their variants and modifiers, and learn how to use them correctly and wisely.</p>
 </div>
 <div class="paragraph">
-<p>Doxter is a &#8220;dumb&#8221; tool&#8201;&#8212;&#8201;it doesn&#8217;t try to interpret or validate what
-comes after these markers, it just uses them to delimit and manipulate lines
-from your source file according to some simple predefined rules.
-It&#8217;s your responsibility to ensure that the contents of the tagged regions
-are AsciiDoc compliant.</p>
+<p>Doxter is a &#8220;dumb&#8221; tool&#8201;&#8212;&#8201;it doesn&#8217;t try to interpret or validate what comes after these markers, it just uses them to delimit and manipulate lines from your source file according to some simple predefined rules.
+It&#8217;s your responsibility to ensure that the contents of the tagged regions are AsciiDoc compliant.</p>
 </div>
 <div class="paragraph">
-<p>But as you shall see, these five simple markers empower you with great freedom
-to document your source code. Thanks to some simple rules devised on common
-sense expectations of how text and source code should blend in documentation,
-Doxter will parse smartly your source files, with little effort on your side.</p>
+<p>But as you shall see, these five simple markers empower you with great freedom to document your source code.
+Thanks to some simple rules devised on common sense expectations of how text and source code should blend in documentation, Doxter will parse smartly your source files, with little effort on your side.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1121,7 +1067,7 @@ Doxter will parse smartly your source files, with little effort on your side.</p
 of how source files are processed, and gain insight into the proper use of
 its markers.
 You can read a full dscription of the parser&#8217;s workflow in the
-<a href="doxter_engine.html#_doxters_parser"><em>Doxter&#8217;s Parser</em> section</a> of Doxter Engine&#8217;s
+<a href="doxter_engine.html#_doxter_parsers"><em>Doxter Parsers</em> section</a> of Doxter Engine&#8217;s
 documentation.
 For the time being, you should just bare in mind a couple of things.</p>
 </div>
@@ -1156,44 +1102,38 @@ each other, and so are their rules.</p>
 <h3 id="_asciidoc_header"><a class="anchor" href="#_asciidoc_header"></a>AsciiDoc Header</h3>
 <div class="paragraph">
 <p>The very first line in your source code is special for Doxter.
-The Header Parser will look if it starts with a <code>;=</code>. This marker is the
-telltale sign for Doxter that the first lines contain an AsciiDoc Header.
+The Header Parser will look if it starts with a <code>;=</code>.
+This marker is the telltale sign for Doxter that the first lines contain an AsciiDoc Header.
 Here&#8217;s an example from the very source of Doxter:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-purebasic hljs" data-lang="purebasic">;= Doxter: A Docs from Sources Generator.
 ;| Tristano Ajmone, &lt;tajmone@gmail.com&gt;
-;| v0.2.4-alpha, Novermber 25, 2018: Public Alpha
+;| v0.2.5-alpha, 2018-11-29: PureBASIC 5.62
 ;| :License: MIT License
-;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
+;| :version-label: Doxter
 ;| :toclevels: 3
-#DOXTER_VER$ = "0.2.4-alpha"
+#DOXTER_VER$ = "0.2.5-alpha"
 ;{******************************************************************************
 ; ··············································································
 ; ······························ PureBasic Doxter ······························
-; ··············································································</code></pre>
+; ··············································································
+; ******************************************************************************</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can easily guess by looking at the first 4 lines in the above code,
-these represent a standard AsciiDoc Header, followed by custom attributes
-(<code>:License: MIT License</code> and <code>:PureBASIC: 5.62</code>), a Skip line (ignored by Doxter)
-used as horizontal ruler divider, and an Asciidoctor settings attribute
-(<code>:toclevels: 3</code>).
-Everything is as it would be in a normal AsciiDoc Header, except that the Header
-lines are inside PureBasic comments.
+<p>As you can easily guess by looking at the first 4 lines in the above code, these represent a standard AsciiDoc Header, followed by a custom attribute (<code>:License: MIT License</code>), a Skip line (ignored by Doxter) used as horizontal ruler divider, and some more Asciidoctor settings attributes (<code>:version-label:</code> and <code>:toclevels:</code>).</p>
+</div>
+<div class="paragraph">
+<p>Everything is as it would be in a normal AsciiDoc Header, except that the Header lines are inside PureBasic comments.
 The remaining lines are just normal (non-Doxter) PB code and comments.</p>
 </div>
 <div class="paragraph">
-<p>When Doxter encounters a <code>;=</code> on the very first line, it will then parse
-all consecutive lines starging by <code>;|</code> (the ADoc comment marker) as part of
-the Header, adding it to the stored Header data.
-Lines starting with <code>~|</code> (the Skip comment marker) are simply ignored, and
-they are not considered as the end of a Header.
-As soon as line not starting by <code>;|</code> or <code>~|</code> is encountered, Doxter will
-stop parsing the Header.</p>
+<p>When Doxter encounters a <code>;=</code> on the very first line, it will then parse all consecutive lines starging by <code>;|</code> (the ADoc comment marker) as part of the Header, adding it to the stored Header data.
+Lines starting with <code>~|</code> (the Skip comment marker) are simply ignored, and they are not considered as the end of a Header.
+As soon as line not starting by <code>;|</code> or <code>~|</code> is encountered, Doxter will stop parsing the Header.</p>
 </div>
 <div class="paragraph">
 <p>Separate handling of the Header is important for two reasons:</p>
@@ -1212,14 +1152,11 @@ file (and regardless of their weights).</p>
 </ol>
 </div>
 <div class="paragraph">
-<p>The latter point is important because it&#8217;s in compliance with how AsciiDoc
-looks for a Header in source files.</p>
+<p>The latter point is important because it&#8217;s in compliance with how AsciiDoc looks for a Header in source files.</p>
 </div>
 <div class="paragraph">
-<p>Whether or not Doxter found and Header in the source file, once it has dealt
-with it it will carry on to the next parsing stage: scanning the source for
-tagged regions. The Header and Regions parsers are two distinct parsers
-that coexist in Doxter, and the latter takes on where the former left.</p>
+<p>Whether or not Doxter found and Header in the source file, once it has dealt with it it will carry on to the next parsing stage: scanning the source for tagged regions.
+The Header and Regions parsers are two distinct parsers that coexist in Doxter, and the latter takes on where the former left.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -1229,9 +1166,7 @@ that coexist in Doxter, and the latter takes on where the former left.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The Header parser doesn&#8217;t consume those lines that didn&#8217;t match its criteria,
-and as soon as it encounters a non Header line it rolls back the parser
-to the last file position, so that the regions parser can parse them instead.</p>
+<p>The Header parser doesn&#8217;t consume those lines that didn&#8217;t match its criteria, and as soon as it encounters a non Header line it rolls back the parser to the last file position, so that the regions parser can parse them instead.</p>
 </div>
 </td>
 </tr>
@@ -1265,54 +1200,14 @@ to the last file position, so that the regions parser can parse them instead.</p
 <p>The documentation is not complete yet, as it lacks the part on practical examples.</p>
 </div>
 <div class="paragraph">
-<p>The provided documentation should be enough to get started using Doxter; for
-examples, study its source code in the mean time, and <em>use it</em>, <em>use it</em>, and
-<em>use it again</em>, for it&#8217;s easier to use than it might seem by reading its
-documentation.
-Also, by using it you can benefit from the
-<a href="#_parsing_live_preview_during_execution">live parsing preview log</a>, which is
-an invaluable tool for learning.</p>
+<p>The provided documentation should be enough to get started using Doxter; for examples, study its source code in the mean time, and <em>use it</em>, <em>use it</em>, and <em>use it again</em>, for it&#8217;s easier to use than it might seem by reading its documentation.</p>
+</div>
+<div class="paragraph">
+<p>Also, by using it you can benefit from the <a href="#_parsing_live_preview_during_execution">live parsing preview log</a>, which is an invaluable tool for learning.</p>
 </div>
 </td>
 </tr>
 </table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_license"><a class="anchor" href="#_license"></a>License</h2>
-<div class="sectionbody">
-<div class="exampleblock">
-<div class="content">
-<div class="paragraph">
-<p>MIT License</p>
-</div>
-<div class="paragraph">
-<p>Copyright (c) 2018 Tristano Ajmone<br>
-<a href="https://github.com/tajmone/doxter" class="bare">https://github.com/tajmone/doxter</a></p>
-</div>
-<div class="paragraph">
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:</p>
-</div>
-<div class="paragraph">
-<p>The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.</p>
-</div>
-<div class="paragraph">
-<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1357,10 +1252,83 @@ projects.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_changelog"><a class="anchor" href="#_changelog"></a>Changelog</h2>
+<h2 id="_license"><a class="anchor" href="#_license"></a>License</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Doxter is released under MIT License.</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>MIT License</p>
+</div>
+<div class="paragraph">
+<p>Copyright (c) 2018 Tristano Ajmone<br>
+<a href="https://github.com/tajmone/doxter" class="bare">https://github.com/tajmone/doxter</a></p>
+</div>
+<div class="paragraph">
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+</div>
+<div class="paragraph">
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+</div>
+<div class="paragraph">
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_doxter_changelog"><a class="anchor" href="#_doxter_changelog"></a>Doxter Changelog</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Changelog of Doxter command line application.</p>
+</div>
 <div class="ulist">
 <ul>
+<li>
+<p><strong>v0.2.5-alpha</strong> (2018/11/29)&#8201;&#8212;&#8201;Documentation outsourcing:
+Move to external AsciiDoc files the documentation regions that are not strictly
+commenting parts of the source code:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Move <code>CHANGELOG</code> region to <code>CHANGELOG.adoc</code>.</p>
+</li>
+<li>
+<p>Move to <code>README.adoc</code> the following commented regions:
+<code>Acknowledgements</code>, <code>Roadmap</code>.</p>
+</li>
+</ul>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>The goal is to keep the source files shorter and that doxtering each source module
+will produce a reference document strictly focusing on the module technicalities.</p>
+</div>
+<div class="paragraph">
+<p>From now on, Doxter documentation will be handled in external AsciiDoc files that
+will then import from the doxterized sources the relevant tagged regions.
+Since the documentation is starting to grow larger, this approach is more flexible
+and allows reusing the same regions contents in multiple documents.</p>
+</div>
+</div>
+</div>
+</li>
 <li>
 <p><strong>v0.2.4-alpha</strong> (2018/11/25)&#8201;&#8212;&#8201;Engine optimizations:</p>
 <div class="ulist">
@@ -1509,7 +1477,7 @@ one encountered will override the previous ones.</p>
 </li>
 <li>
 <p><strong>v0.1.0-alpha</strong> (2018/09/21)&#8201;&#8212;&#8201;First public released Alpha:
-<a href="https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb" class="bare">https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb</a></p>
+<a href="https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb" target="_blank" rel="noopener">https://github.com/tajmone/PBCodeArcProto/blob/83c32cd/_assets/Doxter.pb</a></p>
 </li>
 </ul>
 </div>
@@ -1518,7 +1486,7 @@ one encountered will override the previous ones.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.2.4-alpha<br>
+Doxter 0.2.5-alpha<br>
 </div>
 </div>
 <link rel="stylesheet" href="hjs/styles/github.min.css">

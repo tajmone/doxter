@@ -1,10 +1,10 @@
 ﻿;= Doxter Engine
 ;| Tristano Ajmone, <tajmone@gmail.com>
-;| v0.0.4-alpha, Novermber 25, 2018: Public Alpha
+;| v0.0.5-alpha, 2018-11-29: PureBASIC 5.62
 ;| :License: MIT License
-;| :PureBASIC: 5.62
 ;~------------------------------------------------------------------------------
 ;| :toclevels: 3
+;| :version-label: Doxter Engine
 ;{******************************************************************************
 ; ··············································································
 ; ···························· Doxter Egine Module ·····························
@@ -964,7 +964,7 @@ Module dox
     ; -------------------------------------------------------------------  
     ;>Parser_Live_Preview(50000)
     ;|
-    ;| === Parsing Live Preview During Execution
+    ;| == Parsing Live Preview During Execution
     ;|
     ;| During execution, Doxter will output to the console a preview of the parsed
     ;| lines that belong to tagged regions, showing their ADoc processed version,
@@ -1069,33 +1069,30 @@ EndModule
 ;<
 
 ;>description(.1)
-;| :maindoc: doxter.asciidoc
-
-;| <<{maindoc}#,Back to Doxter CLI documentation>>.
+;| <<index.adoc#,Back to Doxter CLI documentation>>.
 ;<
-
 
 ; ==============================================================================
 ; 1000                                INTRO
 ; ==============================================================================
 
 ;>intro(1000.1)
-
+;| 
 ;| == About Doxter Engine
-
+;| 
 ;| Doxter Engine is the module used by Doxter to parse source files, extract the
 ;| documentation from them and write it to an AsciiDoc file -- this process is
 ;| also known as «doxterizing».
-
+;| 
 ;| This module can also be included in other applications beside the Doxter CLI
 ;| tool, so you can use it to create your own doxterizing apps.
-
+;| 
 ;| Currently, the module is still in Alpha and there is a long way to go before
 ;| it will be optimized to work with other apps -- custom options still need to
 ;| be exposed publicly to allow fine gain control over its behavior, and right
 ;| now all output text is sent to the console, so it will only work in console
 ;| applications.
-
+;| 
 ;| This document deals with Doxter Engine's API and internals.
 ;<
 
@@ -1104,9 +1101,9 @@ EndModule
 ; ==============================================================================
 
 ;>api(2000.1)
-
+;| 
 ;| == Engine API
-
+;| 
 ;| [WARNING]
 ;| =============================================================================
 ;| The Doxter Engine API is not yet documented.
@@ -1127,7 +1124,8 @@ EndModule
 ; ==============================================================================
 
 ;>The_Parser(4000)
-;| == Doxter's Parser
+;| 
+;| == Doxter Parsers
 ;|
 ;| Understanding how Doxter's parser works will help you grasp a clearer picture
 ;| of how source files are processed, and gain insight into the proper use of
@@ -1155,9 +1153,15 @@ EndModule
 ;| point if you're new to Doxter -- also, don't forget to look at source code of
 ;| Doxter, for it's self-documenting by its own system, and you can compare the
 ;| source to the AsciiDoc output and study it, if you like to learn by examples.
-
 ;<
 
+; ==============================================================================
+;                                   CHANGELOG
+; ==============================================================================
+;>CHANGELOG(9999)
+;| == CHANGELOG
+;| include::../CHANGELOG.adoc[tag=EngineCHANGELOG]
+;<
 
 ;{>LICENSE(9000)
 ;| == License
@@ -1187,34 +1191,3 @@ EndModule
 ;| SOFTWARE.
 ;| =============================================================================
 ;}<
-;}******************************************************************************
-; *                                                                            *
-;-                                  CHANGELOG
-; *                                                                            *
-; ******************************************************************************
-;{>CHANGELOG(20000)
-;| == Changelog
-;|
-;| * *v0.0.4-alpha* (2018/11/25) -- Engine optimizations:
-;| ** The engine code has been slightly optimized to improve performance and
-;|    code maintainability:
-;| *** Reduced the number of RegExs used by the engine by optimizing reusability.
-;| *** Source lines parsing has been optimized in both the Header Parser and the
-;|     Regions Parser.
-;| *** Deleted internal procedures:
-;| **** `IsAdocComment()`
-;| **** `IsSkipComment()`
-;| **** `StripCommentLine()`
-;| * *v0.0.3-alpha* (2018/10/11) -- BUG FIX: Read Alan sources as ISO-8859-1:
-;| ** Add `fileEnconding` var to allow setting file read operations for Alan
-;|    sources to Ascii (`#PB_Ascii`) to avoid breaking special characters that
-;|    were being read as if encoded in UTF-8. 
-;| * *v0.0.2-alpha* (2018/10/10) -- Add support for Alan language, and improve
-;|   SpiderBasic support:
-;| ** The Engine now exposes a `dox::SetEngineLang(lang.s)` procedure to allow
-;|    setting the comment delimiter and the language of source blocks according
-;|    to the selected language (`"PureBasic"`, `"SpiderBasic"` or `"Alan"`). 
-;| * *v0.0.1-alpha* (2018/10/03) -- First module engine release.
-;}<
-
-
