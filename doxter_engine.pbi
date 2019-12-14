@@ -7,14 +7,14 @@
 ;| :version-label: Doxter Engine
 ;{******************************************************************************
 ; ··············································································
-; ···························· Doxter Egine Module ·····························
+; ···························· Doxter Engine Module ····························
 ; ··············································································
 ; ******************************************************************************
 ;>description(1.2)
 ;| =============================================================================
 ;| image::doxter_logo.svg[Doxter Logo,align="center"]
 ;|
-;| The Doxter Egine contains the core functionalities behind the Doxter CLI
+;| The Doxter Engine contains the core functionalities behind the Doxter CLI
 ;| application, and can be included as a module in other applications and used
 ;| to doxterize source files programmatically through its API.
 ;| Released under <<License,MIT License>>.
